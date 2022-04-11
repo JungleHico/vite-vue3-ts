@@ -312,6 +312,43 @@ export default router;
 + app.use(router).mount('#app');
 ```
 
+NProgress 插件显示页面加载进度条：
+
+```sh
+yarn add nprogress
+yarn add -D @types/nprogress
+```
+
+```diff
+  // src/router/index.ts
+  import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+  import Home from '@/components/Home.vue';
++ import NProgress from 'nprogress';
++ import 'nprogress/nprogress.css';
+
+  const routes: RouteRecordRaw[] = [
+    {
+      path: '/',
+      component: Home
+    }
+  ];
+
+  const router = createRouter({
+    history: createWebHistory(''),
+    routes
+  });
+
++ router.beforeEach(() => {
++   NProgress.start();
++ });
+
++ router.afterEach(() => {
++   NProgress.done();
++ });
+
+  export default router;
+```
+
 
 
 ## 封装请求
@@ -794,6 +831,8 @@ export const useLoginStore = defineStore('login', {
 
 ```typescript
 // src/router/index.ts
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 import { useLoginStore } from '@/store/loginStore';
 
 // 免登录白名单
@@ -801,6 +840,7 @@ const whiteList = ['/login', '/404'];
 
 // 路由守卫，登录拦截
 router.beforeEach(async (to, from) => {
+  NProgress.start();
   const token = localStorage.getItem('token');
   if (token) {
     // 有token
@@ -830,6 +870,10 @@ router.beforeEach(async (to, from) => {
     // 重定向到登录页
     return '/login';
   }
+});
+
+router.afterEach(() => {
+  NProgress.done();
 });
 ```
 
@@ -930,3 +974,8 @@ Vue Router4 中，路由守卫是异步解析执行，此时导航在所有守�
   }
 ```
 
+
+
+## 权限管理
+
+### 图标动态导入

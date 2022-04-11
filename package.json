@@ -8,15 +8,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^6.1.0",
     "ant-design-vue": "^2.2.8",
     "axios": "^0.26.1",
     "mockjs": "^1.1.0",
+    "nprogress": "^0.2.0",
     "pinia": "^2.0.13",
     "vue": "^3.2.25",
     "vue-router": "^4.0.14"
   },
   "devDependencies": {
     "@types/node": "^17.0.23",
+    "@types/nprogress": "^0.2.0",
     "@vitejs/plugin-vue": "^2.2.0",
     "less": "^4.1.2",
     "prettier": "^2.6.1",

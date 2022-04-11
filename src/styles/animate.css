@@ -1,0 +1,8 @@
+/* 淡入动画 */
+.fade-in-enter-active {
+  transition: opacity 0.5s ease;
+}
+.fade-in-enter-from,
+.fade-in-leave-to {
+  opacity: 0;
+}

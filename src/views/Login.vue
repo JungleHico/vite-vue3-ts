@@ -15,7 +15,7 @@
         <a-input
           v-model:value="formState.account"
           size="large"
-          placeholder="账号"
+          placeholder="账号：admin"
         >
           <template #prefix>
             <user-outlined class="input-icon"></user-outlined>
@@ -26,7 +26,7 @@
         <a-input-password
           v-model:value="formState.password"
           size="large"
-          placeholder="密码"
+          placeholder="密码：1234"
         >
           <template #prefix>
             <lock-outlined class="input-icon"></lock-outlined>

@@ -45,7 +45,7 @@ const loginServices: MockMethod[] = [
         code: 0,
         data: {
           username: 'admin',
-          avatar: Random.image('100x100', '#aaa', '#f00', 'a')
+          avatar: Random.image('100x100', '#ccc', '#f00', 'a')
         },
         message: 'success'
       };

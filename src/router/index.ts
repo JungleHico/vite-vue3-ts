@@ -1,11 +1,40 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import Home from '@/components/Home.vue';
+import LayoutMain from '@/layouts/LayoutMain.vue';
+import { RouterView } from 'vue-router';
 import { useLoginStore } from '@/store/loginStore';
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 
-const routes: RouteRecordRaw[] = [
+export const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: Home
+    component: LayoutMain,
+    redirect: '/welcome',
+    children: [
+      {
+        path: '/welcome',
+        component: () => import('@/views/Welcome.vue'),
+        meta: { title: '欢迎页', icon: 'HomeOutlined' }
+      },
+      {
+        path: '/form',
+        component: RouterView,
+        redirect: '/basicForm',
+        meta: { title: '表单页', icon: 'FormOutlined' },
+        children: [
+          {
+            path: '/basicForm',
+            component: () => import('@/views/form/BasicForm.vue'),
+            meta: { title: '基础表单' }
+          },
+          {
+            path: '/stepForm',
+            component: () => import('@/views/form/StepForm.vue'),
+            meta: { title: '分步表单' }
+          }
+        ]
+      }
+    ]
   },
   {
     path: '/login',
@@ -23,6 +52,7 @@ const whiteList = ['/login', '/404'];
 
 // 路由守卫，登录拦截
 router.beforeEach(async (to, from) => {
+  NProgress.start();
   const token = localStorage.getItem('token');
   if (token) {
     // 有token
@@ -52,6 +82,10 @@ router.beforeEach(async (to, from) => {
     // 重定向到登录页
     return '/login';
   }
+});
+
+router.afterEach(() => {
+  NProgress.done();
 });
 
 export default router;
