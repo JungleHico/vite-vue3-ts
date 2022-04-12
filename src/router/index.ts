@@ -33,12 +33,43 @@ export const routes: RouteRecordRaw[] = [
             meta: { title: '分步表单' }
           }
         ]
+      },
+      {
+        path: '/exception',
+        component: RouterView,
+        redirect: '/exception/403',
+        meta: { title: '异常页', icon: 'WarningOutlined' },
+        children: [
+          {
+            path: '/exception/403',
+            component: () => import('@/views/exception/403.vue'),
+            meta: { title: '403' }
+          },
+          {
+            path: '/exception/404',
+            component: () => import('@/views/exception/404.vue'),
+            meta: { title: '404' }
+          },
+          {
+            path: '/exception/500',
+            component: () => import('@/views/exception/500.vue'),
+            meta: { title: '500' }
+          }
+        ]
       }
     ]
   },
   {
     path: '/login',
     component: () => import('@/views/Login.vue')
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/exception/404.vue')
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404'
   }
 ];
 
