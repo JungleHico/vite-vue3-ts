@@ -6,32 +6,26 @@
       <a-step title="完成"></a-step>
     </a-steps>
     <div class="steps-content">
-      <a-form
-        v-if="current === 0"
-        :model="formState"
-        :rules="rules"
-        v-bind="formItemLayout"
-        @finish="onNext"
-      >
-        <a-form-item label="联系人" name="name">
-          <a-input v-model:value="formState.name" />
+      <a-form v-if="current === 0" v-bind="formItemLayout">
+        <a-form-item label="联系人" v-bind="validateInfos.name">
+          <a-input v-model:value="modelRef.name" />
         </a-form-item>
-        <a-form-item label="联系电话" name="phone">
+        <a-form-item label="联系电话" v-bind="validateInfos.phone">
           <a-input-number
             class="input-number"
-            v-model:value="formState.phone"
+            v-model:value="modelRef.phone"
             :formatter="integerFormatter"
             :controls="false"
           />
         </a-form-item>
-        <a-form-item label="送货地址" name="address">
-          <a-textarea v-model:value="formState.address" :rows="3" />
+        <a-form-item label="送货地址" v-bind="validateInfos.address">
+          <a-textarea v-model:value="modelRef.address" :rows="3" />
         </a-form-item>
-        <a-form-item label="留言" name="remark">
-          <a-textarea v-model:value="formState.remark" :rows="3" />
+        <a-form-item label="留言" v-bind="validateInfos.remark">
+          <a-textarea v-model:value="modelRef.remark" :rows="3" />
         </a-form-item>
         <a-form-item :wrapper-col="stepsButtonLayout">
-          <a-button type="primary" html-type="submit">下一步</a-button>
+          <a-button type="primary" @click="onNext">下一步</a-button>
         </a-form-item>
       </a-form>
 
@@ -39,16 +33,16 @@
         <div class="order-descriptions">
           <a-descriptions :column="1">
             <a-descriptions-item label="联系人">
-              {{ formState.name }}
+              {{ modelRef.name }}
             </a-descriptions-item>
             <a-descriptions-item label="联系电话">
-              {{ formState.phone }}
+              {{ modelRef.phone }}
             </a-descriptions-item>
             <a-descriptions-item label="送货地址">
-              {{ formState.address }}
+              {{ modelRef.address }}
             </a-descriptions-item>
             <a-descriptions-item label="留言">
-              {{ formState.remark }}
+              {{ modelRef.remark }}
             </a-descriptions-item>
           </a-descriptions>
           <a-space>
@@ -70,16 +64,16 @@
           </template>
           <a-descriptions :column="1">
             <a-descriptions-item label="联系人">
-              {{ formState.name }}
+              {{ modelRef.name }}
             </a-descriptions-item>
             <a-descriptions-item label="联系电话">
-              {{ formState.phone }}
+              {{ modelRef.phone }}
             </a-descriptions-item>
             <a-descriptions-item label="送货地址">
-              {{ formState.address }}
+              {{ modelRef.address }}
             </a-descriptions-item>
             <a-descriptions-item label="留言">
-              {{ formState.remark }}
+              {{ modelRef.remark }}
             </a-descriptions-item>
           </a-descriptions>
         </a-result>
@@ -90,6 +84,7 @@
 
 <script setup lang="ts">
 import { integerFormatter, checkPhoneNumber } from '@/utils/form';
+import { Form } from 'ant-design-vue';
 import { Rule } from 'ant-design-vue/es/form';
 
 type FormState = {
@@ -101,27 +96,29 @@ type FormState = {
 
 // 验证手机号
 async function validatePhone(_rule: Rule, value: string) {
-  if (checkPhoneNumber(formState.phone)) {
+  if (checkPhoneNumber(modelRef.phone)) {
     return Promise.resolve();
   }
   return Promise.reject('请输入正确的手机号码');
 }
 
 const current = ref<number>(0);
-const formState = reactive<FormState>({
+const modelRef = reactive<FormState>({
   name: '',
   phone: '',
   address: '',
   remark: ''
 });
-const rules = {
+const rulesRef = reactive({
   name: [{ required: true, message: '请输入联系人姓名' }],
   phone: [
     { required: true, message: '请输入联系电话' },
     { validator: validatePhone, trigger: 'blur' }
   ],
   address: [{ required: true, message: '请输入送货地址' }]
-};
+});
+const useForm = Form.useForm;
+const { resetFields, validate, validateInfos } = useForm(modelRef, rulesRef);
 const formItemLayout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 16 }
@@ -132,16 +129,19 @@ const stepsButtonLayout = {
 };
 
 const onNext = () => {
-  current.value++;
+  if (current.value === 0) {
+    validate().then(() => {
+      current.value++;
+    });
+  } else {
+    current.value++;
+  }
 };
 const onPrev = () => {
   current.value--;
 };
 const onNewOrder = () => {
-  formState.name = '';
-  formState.phone = '';
-  formState.address = '';
-  formState.remark = '';
+  resetFields();
   current.value = 0;
 };
 </script>

@@ -33,7 +33,6 @@ const loginServices: MockMethod[] = [
     response: ({
       headers
     }: MockRequestOptions): BaseResponse<UserInfo | null> => {
-      console.log(headers.authorization);
       if (!headers.authorization) {
         return {
           code: 401,

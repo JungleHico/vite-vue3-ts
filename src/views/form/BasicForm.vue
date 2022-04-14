@@ -1,16 +1,11 @@
 <template>
-  <a-form
-    :model="formState"
-    v-bind="formItemLayout"
-    :rules="rules"
-    @finish="onSubmit"
-  >
-    <a-form-item label="input" name="input">
-      <a-input v-model:value="formState.input" placeholder="输入框" />
+  <a-form v-bind="formItemLayout">
+    <a-form-item label="input" v-bind="validateInfos.input">
+      <a-input v-model:value="modelRef.input" placeholder="输入框" />
     </a-form-item>
     <a-form-item label="inputNumber">
       <a-input-number
-        v-model:value="formState.inputNumber"
+        v-model:value="modelRef.inputNumber"
         class="input-number"
         placeholder="数字输入框"
         :min="0"
@@ -20,64 +15,68 @@
     </a-form-item>
     <a-form-item label="textarea">
       <a-textarea
-        v-model:value="formState.textArea"
+        v-model:value="modelRef.textArea"
         placeholder="文本域"
         :rows="4"
       />
     </a-form-item>
     <a-form-item label="select">
-      <a-select v-model:value="formState.select" placeholder="选择器">
+      <a-select v-model:value="modelRef.select" placeholder="选择器">
         <a-select-option value="chinese">语文</a-select-option>
         <a-select-option value="math">数学</a-select-option>
         <a-select-option value="english">英语</a-select-option>
       </a-select>
     </a-form-item>
-    <a-form-item label="radio" name="radio">
-      <a-radio-group v-model:value="formState.radio">
+    <a-form-item label="radio" v-bind="validateInfos.radio">
+      <a-radio-group v-model:value="modelRef.radio">
         <a-radio value="male">男</a-radio>
         <a-radio value="female">女</a-radio>
       </a-radio-group>
     </a-form-item>
     <a-form-item label="checkbox">
       <a-checkbox-group
-        v-model:value="formState.checkbox"
+        v-model:value="modelRef.checkbox"
         :options="fruitOptions"
       />
     </a-form-item>
     <a-form-item label="datePicker">
       <a-date-picker
-        v-model:value="formState.datePicker"
+        v-model:value="modelRef.datePicker"
         placeholder="日期选择器"
         :disabled-date="disableDateBeforeDay"
       />
     </a-form-item>
     <a-form-item label="switch">
-      <a-switch v-model:checked="formState.switch" />
+      <a-switch v-model:checked="modelRef.switch" />
     </a-form-item>
     <a-form-item label="rate">
-      <a-rate v-model:value="formState.rate" />
+      <a-rate v-model:value="modelRef.rate" />
     </a-form-item>
     <a-form-item label="upload">
       <a-upload
-        v-model:file-list="formState.upload"
+        v-model:file-list="modelRef.upload"
         list-type="picture-card"
         accept="image/*"
         :custom-request="customRequest"
       >
-        <div v-if="formState.upload.length < 3" class="upload-wrapper">
+        <div v-if="modelRef.upload.length < 3" class="upload-wrapper">
           <plus-outlined></plus-outlined>
           <span class="upload-text">上传图片</span>
         </div>
       </a-upload>
     </a-form-item>
     <a-form-item :wrapper-col="submitButtonLayout">
-      <a-button type="primary" html-type="submit">提交</a-button>
+      <a-space>
+        <a-button type="primary" @click="onSubmit">提交</a-button>
+        <a-button @click="onReset">重置</a-button>
+      </a-space>
     </a-form-item>
   </a-form>
 </template>
 
 <script setup lang="ts">
 import { PlusOutlined } from '@ant-design/icons-vue';
+import { Form } from 'ant-design-vue';
 import { integerFormatter, disableDateBeforeDay } from '@/utils/form';
 import { Dayjs } from 'dayjs';
 import { UploadProps } from 'ant-design-vue';
@@ -95,7 +94,8 @@ type FormState = {
   upload: UploadProps[];
 };
 
-const formState = reactive<FormState>({
+// 表单数据
+const modelRef = reactive<FormState>({
   input: '',
   inputNumber: undefined,
   textArea: '',
@@ -107,10 +107,13 @@ const formState = reactive<FormState>({
   rate: 4,
   upload: []
 });
-const rules = {
+// 表单验证规则
+const rulesRef = reactive({
   input: [{ required: true, message: '请输入' }],
   radio: [{ required: true, message: '请选择' }]
-};
+});
+const useForm = Form.useForm;
+const { resetFields, validate, validateInfos } = useForm(modelRef, rulesRef);
 const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 14 }
@@ -135,7 +138,7 @@ const initUpload = () => {
     status: 'done',
     url
   };
-  formState.upload.push(image);
+  modelRef.upload.push(image);
 };
 
 // 自定义图片上传
@@ -160,11 +163,11 @@ const customRequest = (res: any) => {
   //   .catch(() => {
   //     res.onError();
   //     // 上传失败，移除图片
-  //     const index = formState.upload.findIndex(
+  //     const index = modelRef.upload.findIndex(
   //       (image: any) => image.uid === uid
   //     );
   //     if (index >= 0) {
-  //       formState.upload.splice(index, 1);
+  //       modelRef.upload.splice(index, 1);
   //     }
   //   });
 
@@ -175,7 +178,14 @@ const customRequest = (res: any) => {
 };
 // 提交表单
 const onSubmit = () => {
-  console.log('onSubmit', formState);
+  validate().then(() => {
+    console.log('onSubmit', modelRef);
+  });
+};
+// 重置表单
+const onReset = () => {
+  resetFields();
+  initUpload();
 };
 
 initUpload();

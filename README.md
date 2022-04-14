@@ -25,8 +25,6 @@ yarn dev
 # 或 npm run dev
 ```
 
-
-
 ## Volar 语法提示插件
 
 推荐在 VS Code 中安装 Volar 扩展，Volar 为 Vue3 和 TS 提供了更加友好的语法提示。
@@ -35,13 +33,9 @@ yarn dev
 
 > 安装 Volar 需要先关闭 Vetur 并重启 IDE。
 
-
-
 ## ESLint
 
 略。
-
-
 
 ## Prettier
 
@@ -108,8 +102,6 @@ module.exports = {
 
 Prettier 格式化代码时，如果发现项目根目录有配置文件，则会优先使用配置文件的规则，这样就可以对代码统一格式化。
 
-
-
 ## 类型声明文件
 
 新建 `types` 文件夹，用于统一存放项目中的类型声明文件，我们把默认生成的 `src/env.d.ts` 文件也放到这个文件夹中统一管理。然后修改 `tsconfig.json` ，增加 TS 编译目录和类型声明目录：
@@ -128,8 +120,6 @@ Prettier 格式化代码时，如果发现项目根目录有配置文件，则�
     ]
   }
 ```
-
-
 
 ## setup 语法糖自动导入 API
 
@@ -167,8 +157,6 @@ yarn add unplugin-auto-import -D
   </script>
 ```
 
-
-
 ## 配置路径别名
 
 首先需要安装 `@types/node` 来识别 node 模块：
@@ -177,7 +165,7 @@ yarn add unplugin-auto-import -D
 yarn add @types/node -D
 ```
 
- 然后修改 `vite.config.js`：
+然后修改 `vite.config.js`：
 
 ```diff
   import { defineConfig } from 'vite';
@@ -214,17 +202,13 @@ yarn add @types/node -D
 }
 ```
 
-
-
 ## CSS 预处理器
 
-Vite 内置了对  `.scss`, `.sass`, `.less`, `.styl` 和 `.stylus` 文件的支持，只需要安装预处理依赖即可：
+Vite 内置了对 `.scss`, `.sass`, `.less`, `.styl` 和 `.stylus` 文件的支持，只需要安装预处理依赖即可：
 
 ```sh
 yarn add less -D
 ```
-
-
 
 ## Ant Design Vue 组件库
 
@@ -236,28 +220,27 @@ Ant Design Vue 的用法参考：[Ant Design Vue 官方文档](https://2x.antdv.
 yarn add ant-design-vue@next
 ```
 
-为了实现按需导入，需要安装 `vite-plugin-components` 插件：
+为了实现按需导入，需要安装 `unplugin-vue-components` 插件：
 
 ```sh
-yarn add vite-plugin-components -D
+yarn add unplugin-vue-components -D
 ```
 
 然后修改 `vite.config.js` ：
 
 ```diff
   import { defineConfig } from 'vite';
-+ import ViteComponents, { AntDesignVueResolver } from 'vite-plugin-components';
++ import Components from 'unplugin-vue-components/vite';
++ import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
 
   export default defineConfig({
     plugins: [
-+     ViteComponents({
-+       customComponentResolvers: [AntDesignVueResolver()]
++     Components({
++       resolvers: [AntDesignVueResolver()]
 +     })
     ]
   });
 ```
-
-
 
 ## Vue Router
 
@@ -349,8 +332,6 @@ yarn add -D @types/nprogress
   export default router;
 ```
 
-
-
 ## 封装请求
 
 ### 安装
@@ -371,14 +352,14 @@ import axios, { AxiosInstance } from 'axios';
 class Request {
   private _http: AxiosInstance;
   private static _instance: Request | undefined;
-  
+
   constructor() {
     this._http = axios.create({
       baseURL: '',
       timeout: 10000
     });
   }
-  
+
   // 返回单例
   public static getInstance(): Request {
     this._instance || (this._instance = new Request());
@@ -395,7 +376,7 @@ export default Request.getInstance();
 
 有些时候，我们需要对请求进行统一配置，例如：
 
-- 请求拦截：在请求头中统一添加鉴权 `token` 
+- 请求拦截：在请求头中统一添加鉴权 `token`
 - 响应拦截：对接口错误信息统一进行显示
 
 ```diff
@@ -532,7 +513,7 @@ export default Request.getInstance();
 
 ### 封装 API
 
-首先创建 `types/model/user.d.ts` ，用于定义数据类型：
+首先创建 `types/user.d.ts` ，用于定义数据类型：
 
 ```typescript
 declare type UserInfo = {
@@ -549,8 +530,6 @@ import http from '@/utils/http';
 // 获取用户基本信息
 export const getUserInfo = () => http.get<UserInfo>('/api/userInfo');
 ```
-
-
 
 ## Mock
 
@@ -620,7 +599,7 @@ const mockServices: MockMethod[] = [
 export default mockServices;
 ```
 
-更多 Mock.js 的用法参考：[Mock.js示例](http://mockjs.com/examples.html) 。
+更多 Mock.js 的用法参考：[Mock.js 示例](http://mockjs.com/examples.html) 。
 
 ### 添加 TS 编译目录
 
@@ -637,8 +616,6 @@ export default mockServices;
   }
 ```
 
-
-
 ## Pinia
 
 [Pinia](https://pinia.vuejs.org/introduction.html) 是 Vue 官方团队开发的 Vue 状态管理的解决方案，Pinia 实现了 Vuex 5 的许多提案，是下一代的 Vuex。
@@ -648,7 +625,7 @@ Pinia 相比于 Vuex 3/4，具有以下特点：
 - 去除了 `mutations` ，不再需要通过 `mutations` 这种冗长的方式修改状态。
 - 更好地 TypeScript 支持。
 - 无需手动添加 store，store 创建后会自动添加。
-- 扁平化设计，无嵌套模块，也不需要命名空间，store 之间可以交叉组合使用。 
+- 扁平化设计，无嵌套模块，也不需要命名空间，store 之间可以交叉组合使用。
 
 ### 安装
 
@@ -727,8 +704,6 @@ const onPlus = () => {
 
 状态值可以直接在组件中修改，但是建议通过 `actions` 封装方法，避免数据混乱，难以维护。
 
-
-
 ## 登录拦截
 
 ### 实现原理
@@ -749,7 +724,7 @@ const onPlus = () => {
 - `UserInfo` ：用户基本信息数据格式
 
 ```typescript
-// types/model/login.ts
+// types/login.ts
 declare type Account = {
   account: string;
   password: string;
@@ -899,7 +874,7 @@ Vue Router4 中，路由守卫是异步解析执行，此时导航在所有守�
 +   AxiosRequestHeaders,
     AxiosResponse
   } from 'axios';
-  
+
   class Request {
 	// ...
 
@@ -974,8 +949,45 @@ Vue Router4 中，路由守卫是异步解析执行，此时导航在所有守�
   }
 ```
 
-
-
 ## 权限管理
 
-### 图标动态导入
+### 图标动态导入（ant-design-vue）
+
+## 打包分析
+
+Vite 基于 Rollup 进行打包，因此，可以使用 Rollup Plugin Visualizer 插件进行打包分析。
+
+```sh
+yarn add -D rollup-plugin-visualizer
+```
+
+```typescript
+// vite.config.ts
+import { defineConfig } from 'vite';
+import { visualizer } from 'rollup-plugin-visualizer';
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [
+    // 打包分析
+    visualizer((options: any) => {
+      return {
+        template: 'sunburst',
+        gzipSize: true
+      };
+    })
+  ]
+});
+```
+
+更多配置选项参考：[rollup-plugin-visualizer](https://github.com/btd/rollup-plugin-visualizer) 。
+
+然后打包到生产环境：
+
+```sh
+yarn build
+```
+
+打包完成后会生成 `stats.html` 文件，打开后就是项目打包的可视化分析图。
+
+![rollup-plugin-visualizer](./docs/images/rollup-plugin-visualizer.png)

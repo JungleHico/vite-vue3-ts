@@ -19,18 +19,36 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '/form',
         component: RouterView,
-        redirect: '/basicForm',
+        redirect: '/form/basicForm',
         meta: { title: '表单页', icon: 'FormOutlined' },
         children: [
           {
-            path: '/basicForm',
+            path: '/form/basicForm',
             component: () => import('@/views/form/BasicForm.vue'),
             meta: { title: '基础表单' }
           },
           {
-            path: '/stepForm',
+            path: '/form/stepForm',
             component: () => import('@/views/form/StepForm.vue'),
             meta: { title: '分步表单' }
+          }
+        ]
+      },
+      {
+        path: '/list',
+        component: RouterView,
+        redirect: '/list/tableList',
+        meta: { title: '列表页', icon: 'TableOutlined' },
+        children: [
+          {
+            path: '/list/tableList',
+            component: () => import('@/views/list/TableList/index.vue'),
+            meta: { title: '查询表格' }
+          },
+          {
+            path: '/list/cardList',
+            component: () => import('@/views/list/CardList.vue'),
+            meta: { title: '卡片列表' }
           }
         ]
       },

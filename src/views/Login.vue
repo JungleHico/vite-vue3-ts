@@ -4,16 +4,10 @@
       <img class="logo" src="@/assets/images/logo.png" alt="logo" />
       <span class="title">后台管理系统</span>
     </div>
-    <a-form
-      ref="formRef"
-      :model="formState"
-      :rules="rules"
-      class="form"
-      @finish="onLogin"
-    >
-      <a-form-item name="account">
+    <a-form class="form">
+      <a-form-item v-bind="validateInfos.account">
         <a-input
-          v-model:value="formState.account"
+          v-model:value="modelRef.account"
           size="large"
           placeholder="账号：admin"
         >
@@ -22,9 +16,9 @@
           </template>
         </a-input>
       </a-form-item>
-      <a-form-item name="password">
+      <a-form-item v-bind="validateInfos.account">
         <a-input-password
-          v-model:value="formState.password"
+          v-model:value="modelRef.password"
           size="large"
           placeholder="密码：1234"
         >
@@ -38,8 +32,8 @@
           type="primary"
           block
           size="large"
-          html-type="submit"
           :loading="loading"
+          @click="onLogin"
         >
           登录
         </a-button>
@@ -52,39 +46,42 @@
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import { useRouter } from 'vue-router';
 import { useLoginStore } from '@/store/loginStore';
+import { Form } from 'ant-design-vue';
 
 type FormState = {
   account: string;
   password: string;
 };
 
-// data
 const router = useRouter();
 const loginStore = useLoginStore();
 // 表单数据
-const formRef = ref();
-const formState = reactive<FormState>({
+const modelRef = reactive<FormState>({
   account: '',
   password: ''
 });
-const rules = {
+// 表单验证规则
+const rulesRef = reactive({
   account: [{ required: true, message: '请输入帐号' }],
   password: [{ required: true, message: '请输入密码' }]
-};
+});
+const useForm = Form.useForm;
+const { validate, validateInfos } = useForm(modelRef, rulesRef);
 const loading = ref<boolean>(false);
 
-// methods
-const onLogin = async (values: FormState) => {
-  loading.value = true;
+const onLogin = () => {
+  validate().then(async (values: FormState) => {
+    loading.value = true;
 
-  try {
-    await loginStore.login(values);
-    router.push('/');
-  } catch (error) {
-    return Promise.reject(error);
-  } finally {
-    loading.value = false;
-  }
+    try {
+      await loginStore.login(values);
+      router.push('/');
+    } catch (error) {
+      return Promise.reject(error);
+    } finally {
+      loading.value = false;
+    }
+  });
 };
 </script>
 
