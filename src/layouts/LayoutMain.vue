@@ -4,7 +4,8 @@
     <a-layout class="layout-right">
       <global-header></global-header>
       <a-layout-content class="layout-content">
-        <div class="content">
+        <page-header @refresh="onRefresh"></page-header>
+        <div v-if="showContent" class="content">
           <router-view></router-view>
         </div>
       </a-layout-content>
@@ -15,6 +16,16 @@
 <script setup lang="ts">
 import Sidebar from './Sidebar/index.vue';
 import GlobalHeader from './GlobalHeader/index.vue';
+import PageHeader from './PageHeader.vue';
+
+const showContent = ref<boolean>(true);
+
+const onRefresh = () => {
+  showContent.value = false;
+  nextTick(() => {
+    showContent.value = true;
+  });
+};
 </script>
 
 <style scoped lang="less">

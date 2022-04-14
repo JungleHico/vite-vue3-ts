@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import LayoutMain from '@/layouts/LayoutMain.vue';
 import { RouterView } from 'vue-router';
 import { useLoginStore } from '@/store/loginStore';
+import { useVisitedRoutesStore } from '@/store/visitedRoutesStore';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 
@@ -133,8 +134,12 @@ router.beforeEach(async (to, from) => {
   }
 });
 
-router.afterEach(() => {
+router.afterEach((to) => {
   NProgress.done();
+  // 添加已访问路由
+  const visitedRoutesStore = useVisitedRoutesStore();
+  visitedRoutesStore.addVisitedRoutes(to);
+  visitedRoutesStore.activePath = to.fullPath;
 });
 
 export default router;
