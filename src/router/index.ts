@@ -76,6 +76,19 @@ export const routes: RouteRecordRaw[] = [
             meta: { title: '500' }
           }
         ]
+      },
+      {
+        path: '/system',
+        component: RouterView,
+        redirect: '/system/permissionList',
+        meta: { title: '系统', icon: 'SettingOutlined' },
+        children: [
+          {
+            path: '/system/permissionList',
+            component: () => import('@/views/system/permission/index.vue'),
+            meta: { title: '权限列表' }
+          }
+        ]
       }
     ]
   },

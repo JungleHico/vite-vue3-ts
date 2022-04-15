@@ -59,7 +59,6 @@ import {
   FullscreenOutlined,
   FullscreenExitOutlined
 } from '@ant-design/icons-vue';
-import { Ref } from 'vue';
 
 type TableSize = 'default' | 'middle' | 'small';
 type Props = {

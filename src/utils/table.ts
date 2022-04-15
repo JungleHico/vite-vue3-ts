@@ -20,3 +20,26 @@ export const columns = [
     dataIndex: 'action'
   }
 ];
+
+export const permissionsColumns = [
+  {
+    title: 'ID',
+    dataIndex: 'id'
+  },
+  {
+    title: '权限标识',
+    dataIndex: 'key'
+  },
+  {
+    title: '权限名称',
+    dataIndex: 'name'
+  },
+  {
+    title: '操作类型',
+    dataIndex: 'actions'
+  },
+  {
+    title: '操作',
+    dataIndex: 'action'
+  }
+];
