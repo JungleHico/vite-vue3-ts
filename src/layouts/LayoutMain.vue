@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import Sidebar from './Sidebar/index.vue';
 import GlobalHeader from './GlobalHeader/index.vue';
-import PageHeader from './PageHeader.vue';
+import PageHeader from './PageHeader/index.vue';
 
 const showContent = ref<boolean>(true);
 

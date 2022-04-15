@@ -11,6 +11,7 @@ export const routes: RouteRecordRaw[] = [
     path: '/',
     component: LayoutMain,
     redirect: '/welcome',
+    meta: { title: '首页' },
     children: [
       {
         path: '/welcome',
@@ -140,6 +141,8 @@ router.afterEach((to) => {
   const visitedRoutesStore = useVisitedRoutesStore();
   visitedRoutesStore.addVisitedRoutes(to);
   visitedRoutesStore.activePath = to.fullPath;
+  // 设置面包屑导航
+  visitedRoutesStore.setBreadcrumb(to);
 });
 
 export default router;

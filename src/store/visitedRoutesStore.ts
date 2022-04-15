@@ -1,16 +1,18 @@
 import { defineStore } from 'pinia';
-import { RouteLocationNormalized } from 'vue-router';
+import { RouteLocationNormalized, RouteRecordNormalized } from 'vue-router';
 
 type visitedRoutesState = {
   visitedRoutes: RouteLocationNormalized[];
   activePath: string;
+  breadList: RouteRecordNormalized[];
 };
 
 export const useVisitedRoutesStore = defineStore('visitedRoutes', {
   state: (): visitedRoutesState => {
     return {
       visitedRoutes: [], // 已访问路由
-      activePath: '' // 当前路径
+      activePath: '', // 当前路径
+      breadList: [] // 面包屑导航列表
     };
   },
   actions: {
@@ -55,6 +57,13 @@ export const useVisitedRoutesStore = defineStore('visitedRoutes', {
           visitedRoute.fullPath === this.activePath
       );
       this.visitedRoutes = this.visitedRoutes.slice(0, index + 1);
+    },
+    // 面包屑导航
+    setBreadcrumb(route: RouteLocationNormalized) {
+      this.breadList = [];
+      route.matched.forEach((item: RouteRecordNormalized) => {
+        this.breadList.push(item);
+      });
     }
   }
 });

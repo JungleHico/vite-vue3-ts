@@ -58,9 +58,11 @@
       </template>
     </a-tabs>
   </div>
+  <breadcrumb-nav></breadcrumb-nav>
 </template>
 
 <script setup lang="ts">
+import BreadcrumbNav from './BreadcrumbNav.vue';
 import {
   ReloadOutlined,
   MoreOutlined,
