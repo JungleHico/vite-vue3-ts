@@ -87,6 +87,11 @@ export const routes: RouteRecordRaw[] = [
             path: '/system/permissionList',
             component: () => import('@/views/system/permission/index.vue'),
             meta: { title: '权限列表' }
+          },
+          {
+            path: '/system/roleList',
+            component: () => import('@/views/system/role/index.vue'),
+            meta: { title: '角色列表' }
           }
         ]
       }
@@ -94,11 +99,13 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/login',
-    component: () => import('@/views/Login.vue')
+    component: () => import('@/views/Login.vue'),
+    meta: { hidden: true }
   },
   {
     path: '/404',
-    component: () => import('@/views/exception/404.vue')
+    component: () => import('@/views/exception/404.vue'),
+    meta: { hidden: true }
   },
   {
     path: '/:pathMatch(.*)*',

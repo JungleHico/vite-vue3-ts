@@ -69,23 +69,6 @@ const formItemLayout = {
 };
 const loading = ref<boolean>(false);
 
-const onOk = () => {
-  validate().then(() => {
-    if (props.action === 'create') {
-      // TODO 创建数据
-    } else {
-      // TODO 更新数据
-    }
-
-    // 模拟接口
-    loading.value = true;
-    setTimeout(() => {
-      loading.value = false;
-      emits('ok');
-    }, 1000);
-  });
-};
-
 watch(
   () => props.visible,
   (visible: boolean) => {
@@ -102,6 +85,24 @@ watch(
     }
   }
 );
+
+const onOk = () => {
+  validate().then((...params) => {
+    console.log(toRaw(modelRef));
+    if (props.action === 'create') {
+      // TODO 创建数据
+    } else {
+      // TODO 更新数据
+    }
+
+    // 模拟接口
+    loading.value = true;
+    setTimeout(() => {
+      loading.value = false;
+      emits('ok');
+    }, 1000);
+  });
+};
 </script>
 
 <style scoped></style>

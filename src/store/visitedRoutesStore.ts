@@ -17,12 +17,14 @@ export const useVisitedRoutesStore = defineStore('visitedRoutes', {
   },
   actions: {
     addVisitedRoutes(route: RouteLocationNormalized) {
-      const exist = this.visitedRoutes.some(
-        (visitedRoute: RouteLocationNormalized) =>
-          visitedRoute.fullPath === route.fullPath
-      );
-      if (!exist) {
-        this.visitedRoutes.push(route);
+      if (!route.meta.hidden) {
+        const exist = this.visitedRoutes.some(
+          (visitedRoute: RouteLocationNormalized) =>
+            visitedRoute.fullPath === route.fullPath
+        );
+        if (!exist) {
+          this.visitedRoutes.push(route);
+        }
       }
     },
     // 移除当前路由

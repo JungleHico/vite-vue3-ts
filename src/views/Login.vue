@@ -27,12 +27,13 @@
           </template>
         </a-input-password>
       </a-form-item>
-      <a-form-item html-type="submit">
+      <a-form-item>
         <a-button
           type="primary"
           block
           size="large"
           :loading="loading"
+          html-type="submit"
           @click="onLogin"
         >
           登录

@@ -21,6 +21,7 @@ export const columns = [
   }
 ];
 
+// 权限列表
 export const permissionsColumns = [
   {
     title: 'ID',
@@ -37,6 +38,26 @@ export const permissionsColumns = [
   {
     title: '操作类型',
     dataIndex: 'actions'
+  },
+  {
+    title: '操作',
+    dataIndex: 'action'
+  }
+];
+
+// 角色列表
+export const rolesColumns = [
+  {
+    title: 'ID',
+    dataIndex: 'id'
+  },
+  {
+    title: '角色名称',
+    dataIndex: 'name'
+  },
+  {
+    title: '描述',
+    dataIndex: 'desc'
   },
   {
     title: '操作',

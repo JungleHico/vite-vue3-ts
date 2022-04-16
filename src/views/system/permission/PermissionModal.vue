@@ -38,7 +38,7 @@ type Props = {
 };
 type Emits = {
   (event: 'update:visible', value: boolean): void;
-  (event: 'ok');
+  (event: 'ok'): void;
 };
 type FormState = {
   id?: number;
@@ -114,7 +114,8 @@ watch(
 
 const onOk = () => {
   validate().then(() => {
-    if (props.actions === 'create') {
+    console.log(toRaw(modelRef));
+    if (props.action === 'create') {
       // TODO 新增权限
     } else {
       // TODO 更新数据

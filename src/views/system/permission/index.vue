@@ -93,6 +93,7 @@ const onRefresh = () => {
 };
 // 新增
 const onCreate = () => {
+  action.value = 'create';
   showModal.value = true;
 };
 // 编辑
