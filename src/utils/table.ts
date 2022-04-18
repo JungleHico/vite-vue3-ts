@@ -45,6 +45,42 @@ export const permissionsColumns = [
   }
 ];
 
+// 菜单管理
+export const menuColumns = [
+  {
+    title: 'ID',
+    dataIndex: 'id'
+  },
+  {
+    title: '菜单名称',
+    dataIndex: 'name'
+  },
+  {
+    title: '路径',
+    dataIndex: 'path'
+  },
+  {
+    title: '图标',
+    dataIndex: 'icon'
+  },
+  {
+    title: '是否隐藏',
+    dataIndex: 'hidden'
+  },
+  {
+    title: '父节点',
+    dataIndex: 'parentId'
+  },
+  {
+    title: '排序值',
+    dataIndex: 'sort'
+  },
+  {
+    title: '操作',
+    dataIndex: 'action'
+  }
+];
+
 // 角色列表
 export const rolesColumns = [
   {

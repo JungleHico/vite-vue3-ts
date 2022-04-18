@@ -89,9 +89,14 @@ export const routes: RouteRecordRaw[] = [
             meta: { title: '权限列表' }
           },
           {
-            path: '/system/roleList',
+            path: '/system/menu',
+            component: () => import('@/views/system/menu/index.vue'),
+            meta: { title: '菜单管理' }
+          },
+          {
+            path: '/system/role',
             component: () => import('@/views/system/role/index.vue'),
-            meta: { title: '角色列表' }
+            meta: { title: '角色管理' }
           }
         ]
       }
