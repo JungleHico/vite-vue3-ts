@@ -179,7 +179,7 @@ const customRequest = (res: any) => {
 // 提交表单
 const onSubmit = () => {
   validate().then(() => {
-    console.log('onSubmit', modelRef);
+    console.log(toRaw(modelRef));
   });
 };
 // 重置表单

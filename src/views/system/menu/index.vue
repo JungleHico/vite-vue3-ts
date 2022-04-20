@@ -4,10 +4,12 @@
       :columns="menuColumns"
       :data-source="menuList"
       :loading="loading"
+      :pagination="pagination"
       :size="tableSize"
       :row-key="setRowKey"
       :expanded-row-keys="expandedRowKeys"
       @expand="onExpand"
+      @change="onTableChange"
     >
       <template #title>
         <table-toolbar
@@ -21,9 +23,12 @@
       </template>
 
       <template #bodyCell="{ column, text, record }">
-        <template v-if="column.dataIndex === 'icon'">
-          <a-space v-if="text !== ''">
-            <ant-icon :icon="text" />{{ text }}
+        <template v-if="column.dataIndex === 'title'">
+          {{ record.meta.title }}
+        </template>
+        <template v-else-if="column.dataIndex === 'icon'">
+          <a-space v-if="record.meta.icon !== ''">
+            <ant-icon :icon="record.meta.icon" />{{ record.meta.icon }}
           </a-space>
         </template>
         <template v-else-if="column.dataIndex === 'hidden'">
@@ -73,9 +78,14 @@ import {
 import { menuColumns } from '@/utils/table';
 import { getMenu } from '@/api/permission';
 
-const menuList = reactive<MenuItem[]>([]);
+const menuList = ref<MenuItem[]>([]);
 const loading = ref<boolean>(false);
 const tableRef = ref();
+const pagination = reactive<Pagination>({
+  current: 1,
+  pageSize: 10,
+  total: 0
+});
 const tableSize = ref<TableSize>('default');
 const expandedRowKeys = reactive<number[]>([]); // 展开行
 // 弹窗
@@ -85,13 +95,17 @@ const currentItem = ref<MenuItem | null>(null);
 
 const getMenuList = async () => {
   loading.value = true;
+  const params = {
+    current: pagination.current,
+    pageSize: pagination.pageSize
+  };
 
   try {
-    const res = await getMenu();
-    console.log(res);
-    menuList.splice(0, menuList.length, ...res.list);
+    const { list, total } = await getMenu(params);
+    menuList.value = list;
+    pagination.total = total;
   } catch (error) {
-    menuList.splice(0, menuList.length);
+    menuList.value = [];
     return Promise.reject(error);
   } finally {
     loading.value = false;
@@ -101,6 +115,12 @@ const setRowKey = (record: Role) => record.id;
 
 // 刷新
 const onRefresh = () => {
+  getMenuList();
+};
+// 翻页，改变分页大小
+const onTableChange = ({ current, pageSize }: Pagination) => {
+  pagination.current = current;
+  pagination.pageSize = pageSize;
   getMenuList();
 };
 // 展开行

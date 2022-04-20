@@ -48,6 +48,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import { useRouter } from 'vue-router';
 import { useLoginStore } from '@/store/loginStore';
 import { Form } from 'ant-design-vue';
+import md5 from 'blueimp-md5';
 
 type FormState = {
   account: string;
@@ -71,11 +72,14 @@ const { validate, validateInfos } = useForm(modelRef, rulesRef);
 const loading = ref<boolean>(false);
 
 const onLogin = () => {
-  validate().then(async (values: FormState) => {
+  validate().then(async () => {
     loading.value = true;
 
     try {
-      await loginStore.login(values);
+      await loginStore.login({
+        account: modelRef.account,
+        password: md5(modelRef.password)
+      });
       router.push('/');
     } catch (error) {
       return Promise.reject(error);

@@ -1,17 +1,26 @@
-declare type Permission = {
+// declare type Permission = {
+//   id: number;
+//   key: string;
+//   name: string;
+//   actions: string[];
+// };
+
+declare type Api = {
   id: number;
-  key: string;
-  name: string;
-  actions: string[];
+  path: string;
+  desc: string;
+  method: string;
+  group: string;
 };
 
 declare type MenuItem = {
   id: number;
+  parentId: number;
   name: string;
   path: string;
-  icon: string;
-  hidden: boolean;
-  parentId: number;
+  redirect?: string;
+  meta: { title: string; icon: string; hidden: boolean };
+  component: string;
   children?: MenuItem[];
 };
 
@@ -19,5 +28,4 @@ declare type Role = {
   id: number;
   name: string;
   desc: string;
-  permissions: Permission[];
 };

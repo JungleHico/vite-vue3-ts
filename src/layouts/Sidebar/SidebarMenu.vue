@@ -9,7 +9,7 @@
       <a-sub-menu v-if="item.children" :key="item.path">
         <template #icon>
           <ant-icon
-            v-if="item.meta?.icon"
+            v-if="item.meta?.icon && item.meta.icon !== ''"
             :icon="(item.meta.icon as string)"
           ></ant-icon>
         </template>
@@ -57,17 +57,17 @@ const props = defineProps<Props>();
 
 const route = useRoute();
 // 展开菜单
-const openKeys = reactive<string[]>([]);
+const openKeys = ref<string[]>([]);
 // 高亮菜单项
-const selectedKeys = reactive<string[]>([]);
+const selectedKeys = ref<string[]>([]);
 
 // 监听路由，高亮菜单
 watch(
   () => route.path,
   () => {
     const keys = getCurrentMenuKeys(props.menus, route);
-    openKeys.splice(0, openKeys.length, ...keys.openKeys);
-    selectedKeys.splice(0, selectedKeys.length, ...keys.selectedKeys);
+    openKeys.value = keys.openKeys;
+    selectedKeys.value = keys.selectedKeys;
   },
   { immediate: true }
 );

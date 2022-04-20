@@ -23,5 +23,11 @@ declare global {
     query: Recordable;
     headers: Recordable;
   };
+
+  // 请求分页参数
+  type PaginationParams = {
+    current?: number;
+    pageSize?: number;
+  };
 }
 export {};

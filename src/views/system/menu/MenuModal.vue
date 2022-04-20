@@ -17,11 +17,17 @@
           :disabled="action === 'create'"
         />
       </a-form-item>
-      <a-form-item label="菜单名称" v-bind="validateInfos.name">
-        <a-input v-model:value="modelRef.name" />
+      <a-form-item label="路由name" v-bind="validateInfos.name">
+        <a-input v-model:value="modelRef.name" placeholder="唯一英文字符串" />
       </a-form-item>
       <a-form-item label="路径" v-bind="validateInfos.path">
         <a-input v-model:value="modelRef.path" />
+      </a-form-item>
+      <a-form-item label="重定向">
+        <a-input v-model:value="modelRef.redirect" />
+      </a-form-item>
+      <a-form-item label="菜单名称" v-bind="validateInfos.title">
+        <a-input v-model:value="modelRef.title" />
       </a-form-item>
       <a-form-item label="图标">
         <a-auto-complete
@@ -77,6 +83,8 @@ type FormState = {
   parentId: number;
   name: string;
   path: string;
+  redirect: string;
+  title: string;
   icon: string;
   hidden: boolean;
   sort: number | undefined;
@@ -112,14 +120,17 @@ const modelRef = reactive<FormState>({
   parentId: 0,
   name: '',
   path: '',
+  redirect: '',
+  title: '',
   icon: '',
   hidden: false,
   sort: undefined
 });
 // 表单验证规则
 const rulesRef = reactive({
-  name: [{ required: true, message: '请输入菜单名称' }],
-  path: [{ required: true, message: '请输入路径' }]
+  name: [{ required: true, message: '请输入路由name' }],
+  path: [{ required: true, message: '请输入路径' }],
+  title: [{ required: true, message: '请输入菜单名称' }]
 });
 const { resetFields, validate, validateInfos } = Form.useForm(
   modelRef,
@@ -176,8 +187,10 @@ watch(
         modelRef.parentId = props.data.parentId;
         modelRef.name = props.data.name;
         modelRef.path = props.data.path;
-        modelRef.icon = props.data.icon;
-        modelRef.hidden = props.data.hidden;
+        modelRef.redirect = props.data.redirect || '';
+        modelRef.title = props.data.meta.title;
+        modelRef.icon = props.data.meta.icon;
+        modelRef.hidden = props.data.meta.hidden;
       }
       // 新增子菜单，设置父节点为当前节点
       if (props.action === 'create' && props.data) {

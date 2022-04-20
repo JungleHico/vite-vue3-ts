@@ -20,16 +20,22 @@
 
 <script setup lang="ts">
 import SidebarMenu from './SidebarMenu.vue';
-import { RouteRecordRaw } from 'vue-router';
-import { routes } from '@/router';
-import { getMenusFromRoutes } from '@/router/utils';
+// import { RouteRecordRaw } from 'vue-router';
+import { useRouterStore } from '@/store/routerStore';
+// import { routes } from '@/router';
+// import { constantRoutes } from '@/router';
+// import { getMenusFromRoutes } from '@/router/utils';
 import { useMenuStore } from '@/store/menuStore';
 import { storeToRefs } from 'pinia';
 
 // 菜单列表
-const menus: RouteRecordRaw[] = getMenusFromRoutes(
-  routes.find((route: RouteRecordRaw) => route.path === '/')?.children || []
-);
+// const menus: RouteRecordRaw[] = getMenusFromRoutes(
+//   // routes.find((route: RouteRecordRaw) => route.path === '/')?.children || []
+//   constantRoutes.find((route: RouteRecordRaw) => route.path === '/')
+//     ?.children || []
+// );
+const routerStore = useRouterStore();
+const menus = routerStore.menus;
 
 // 菜单折叠/展开
 const menuStore = useMenuStore();

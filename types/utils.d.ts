@@ -5,4 +5,5 @@ declare type Pagination = {
   pageSize: number;
   total: number;
 };
+
 declare type TableSize = 'default' | 'middle' | 'small';

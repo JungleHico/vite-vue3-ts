@@ -3,15 +3,14 @@
     <a-table
       :columns="rolesColumns"
       :data-source="roleList"
-      :size="tableSize"
       :loading="loading"
-      :row-key="setRowKey"
-      :expanded-row-keys="expandedRowKeys"
-      @expand="onExpand"
+      :pagination="pagination"
+      :size="tableSize"
+      @change="onTableChange"
     >
       <template #title>
         <table-toolbar
-          title="角色列表"
+          title="角色管理"
           v-model:size="tableSize"
           create-button-text="新增角色"
           :table-ref="tableRef"
@@ -23,7 +22,10 @@
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'action'">
           <a-space size="middle">
-            <a @click="onEdit(record)">编辑</a>
+            <a @click="onSetAuthority(record.id)"
+              ><setting-outlined></setting-outlined>设置权限</a
+            >
+            <a @click="onEdit(record)"><edit-outlined></edit-outlined>编辑</a>
             <a-popconfirm
               title="确定删除当前内容吗？"
               ok-text="删除"
@@ -31,28 +33,10 @@
               :ok-button-props="{ danger: true }"
               @confirm="onRemove(record)"
             >
-              <a>删除</a>
+              <a><delete-outlined></delete-outlined>删除</a>
             </a-popconfirm>
           </a-space>
         </template>
-      </template>
-
-      <template #expandedRowRender="{ record }">
-        <a-descriptions :column="2">
-          <a-descriptions-item
-            v-for="permission in record.permissions"
-            :key="permission.key"
-            :label="permission.name"
-          >
-            <a-tag
-              v-for="action in permission.actions"
-              :key="action"
-              color="cyan"
-            >
-              {{ action }}
-            </a-tag>
-          </a-descriptions-item>
-        </a-descriptions>
       </template>
     </a-table>
   </div>
@@ -67,50 +51,72 @@
     @cancel="onCancel"
     @ok="onOk"
   ></role-modal>
+
+  <authority-modal
+    v-model:visible="showAuthorityModal"
+    :role-id="currentRoleId"
+    @cancel="onAuthorityModalCancel"
+    @ok="onAuthorityModalOk"
+  ></authority-modal>
 </template>
 
 <script setup lang="ts">
 import TableToolbar from '@/components/TabToolbar.vue';
 import RoleModal from './RoleModal.vue';
+import AuthorityModal from './AuthorityModal/index.vue';
+import {
+  SettingOutlined,
+  EditOutlined,
+  DeleteOutlined
+} from '@ant-design/icons-vue';
 import { rolesColumns } from '@/utils/table';
 import { getRoles } from '@/api/permission';
-const roleList = reactive<Role[]>([]);
+
+const roleList = ref<Role[]>([]);
 const loading = ref<boolean>(false);
 const tableRef = ref();
 const tableSize = ref<TableSize>('default');
-const expandedRowKeys = reactive<number[]>([]); // 展开行
-// 弹窗
+const pagination = reactive<Pagination>({
+  current: 1,
+  pageSize: 10,
+  total: 0
+});
+// 角色弹窗
 const showModal = ref<boolean>(false);
 const action = ref<Action>('create');
 const currentItem = ref<Role | null>(null);
+// 权限弹窗
+const showAuthorityModal = ref<boolean>(false);
+const currentRoleId = ref<number>(0);
 
 const getRoleList = async () => {
   loading.value = true;
+  const params = {
+    current: pagination.current,
+    pageSize: pagination.pageSize
+  };
 
   try {
-    const res = await getRoles();
-    roleList.splice(0, roleList.length, ...res.list);
+    const { list, total } = await getRoles(params);
+    roleList.value = list;
+    pagination.total = total;
   } catch (error) {
-    roleList.splice(0, roleList.length);
+    roleList.value = [];
     return Promise.reject(error);
   } finally {
     loading.value = false;
   }
 };
-const setRowKey = (record: Role) => record.id;
 
 // 刷新
 const onRefresh = () => {
   getRoleList();
 };
-// 展开行
-const onExpand = (expanded: boolean, record: Role) => {
-  if (expanded) {
-    expandedRowKeys.push(record.id);
-  } else {
-    const index = expandedRowKeys.findIndex((id: number) => id === record.id);
-    expandedRowKeys.splice(index, 1);
-  }
+// 翻页，改变分页大小
+const onTableChange = ({ current, pageSize }: Pagination) => {
+  pagination.current = current;
+  pagination.pageSize = pageSize;
+  getRoleList();
 };
 // 新增
 const onCreate = () => {
@@ -131,13 +137,27 @@ const onOk = () => {
   getRoleList();
 };
 // 删除
-const onRemove = (record: TableListItem) => {
+const onRemove = (record: Role) => {
   loading.value = true;
   // TODO 删除接口
   setTimeout(() => {
     loading.value = false;
     getRoleList();
   }, 1000);
+};
+
+// 设置权限
+const onSetAuthority = (roleId: number) => {
+  currentRoleId.value = roleId;
+  showAuthorityModal.value = true;
+};
+// 关闭权限弹窗
+const onAuthorityModalCancel = () => {
+  showAuthorityModal.value = false;
+};
+const onAuthorityModalOk = () => {
+  showAuthorityModal.value = false;
+  window.location.reload();
 };
 
 getRoleList();

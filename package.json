@@ -11,6 +11,7 @@
     "@ant-design/icons-vue": "^6.1.0",
     "ant-design-vue": "^3.1.1",
     "axios": "^0.26.1",
+    "blueimp-md5": "^2.19.0",
     "dayjs": "^1.11.0",
     "mockjs": "^1.1.0",
     "nprogress": "^0.2.0",
@@ -19,6 +20,7 @@
     "vue-router": "^4.0.14"
   },
   "devDependencies": {
+    "@types/blueimp-md5": "^2.18.0",
     "@types/node": "^17.0.23",
     "@types/nprogress": "^0.2.0",
     "@vitejs/plugin-vue": "^2.2.0",

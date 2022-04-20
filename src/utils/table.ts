@@ -21,23 +21,26 @@ export const columns = [
   }
 ];
 
-// 权限列表
-export const permissionsColumns = [
+export const apiColumns = [
   {
     title: 'ID',
     dataIndex: 'id'
   },
   {
-    title: '权限标识',
-    dataIndex: 'key'
+    title: 'API路径',
+    dataIndex: 'path'
   },
   {
-    title: '权限名称',
-    dataIndex: 'name'
+    title: 'API分组',
+    dataIndex: 'group'
   },
   {
-    title: '操作类型',
-    dataIndex: 'actions'
+    title: '描述',
+    dataIndex: 'desc'
+  },
+  {
+    title: '方法',
+    dataIndex: 'method'
   },
   {
     title: '操作',
@@ -52,12 +55,24 @@ export const menuColumns = [
     dataIndex: 'id'
   },
   {
-    title: '菜单名称',
+    title: '路由name',
     dataIndex: 'name'
   },
   {
     title: '路径',
     dataIndex: 'path'
+  },
+  {
+    title: '重定向',
+    dataIndex: 'redirect'
+  },
+  {
+    title: '菜单名称',
+    dataIndex: 'title'
+  },
+  {
+    title: '组件路径',
+    dataIndex: 'component'
   },
   {
     title: '图标',

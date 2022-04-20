@@ -2,6 +2,7 @@ import { MockMethod } from 'vite-plugin-mock';
 import Mock from 'mockjs';
 
 export default [
+  // 获取“查询表格”数据
   {
     url: '/api/tableList',
     method: 'get',

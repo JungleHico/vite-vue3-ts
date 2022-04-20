@@ -1,10 +1,10 @@
 <template>
   <div class="table-wrapper" ref="tableRef">
     <a-table
-      :columns="columns"
-      :data-source="tableList"
-      :pagination="pagination"
+      :columns="apiColumns"
+      :data-source="apiList"
       :loading="loading"
+      :pagination="pagination"
       :size="tableSize"
       :row-key="setRowKey"
       :row-selection="{
@@ -15,8 +15,9 @@
     >
       <template #title>
         <table-toolbar
-          title="查询表格"
+          title="API管理"
           v-model:size="tableSize"
+          create-button-text="新增"
           :table-ref="tableRef"
           @create="onCreate"
           @refresh="onRefresh"
@@ -25,13 +26,7 @@
       </template>
 
       <template #bodyCell="{ column, text, record }">
-        <template v-if="column.dataIndex === 'status'">
-          <a-badge
-            :status="getStatus(text).status"
-            :text="getStatus(text).text"
-          />
-        </template>
-        <template v-else-if="column.dataIndex === 'action'">
+        <template v-if="column.dataIndex === 'action'">
           <a-space size="middle">
             <a @click="onEdit(record)"><edit-outlined></edit-outlined>编辑</a>
             <a @click="onRemove(record)"
@@ -43,41 +38,39 @@
     </a-table>
   </div>
 
-  <table-list-modal
+  <api-modal
     v-model:visible="showModal"
-    :mask-closable="false"
     :action="action"
     :data="currentItem"
     @cancel="onCancel"
     @ok="onOk"
-  ></table-list-modal>
+  ></api-modal>
 </template>
 
 <script setup lang="ts">
 import TableToolbar from '@/components/TabToolbar.vue';
-import TableListModal from './TableListModal.vue';
+import ApiModal from './ApiModal.vue';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';
-import { columns } from '@/utils/table';
-import { getTableList } from '@/api/tableList';
+import { apiColumns } from '@/utils/table';
+import { getApis } from '@/api/permission';
 import ConfirmModal from '@/plugins/ConfirmModal';
 
+const apiList = ref<Api[]>([]);
+const loading = ref<boolean>(false);
 const tableRef = ref();
-const tableList = ref<TableListItem[]>([]);
+const tableSize = ref<TableSize>('default');
 const pagination = reactive<Pagination>({
   current: 1,
   pageSize: 10,
   total: 0
 });
-const loading = ref<boolean>(false);
-const tableSize = ref<TableSize>('default');
 const selectedRowKeys = ref<number[]>([]); // 勾选的行
 // 弹窗
 const showModal = ref<boolean>(false);
 const action = ref<Action>('create');
-const currentItem = ref<TableListItem | null>(null);
+const currentItem = ref<Api | null>(null);
 
-// methods
-const getList = async () => {
+const getApiList = async () => {
   loading.value = true;
   const params = {
     current: pagination.current,
@@ -85,46 +78,38 @@ const getList = async () => {
   };
 
   try {
-    const { list, total } = await getTableList(params);
-    tableList.value = list;
+    const { list, total } = await getApis(params);
+    apiList.value = list;
     pagination.total = total;
   } catch (error) {
-    tableList.value = [];
+    apiList.value = [];
     return Promise.reject(error);
   } finally {
     loading.value = false;
   }
 };
-// 获取状态
-const getStatus = (status: number) => {
-  const statusList = [
-    { status: 'default', text: '关闭' },
-    { status: 'success', text: '开启' }
-  ];
-  return statusList[status];
-};
 const setRowKey = (record: Api) => {
   return record.id;
 };
 
-// events
+// 刷新
+const onRefresh = () => {
+  getApiList();
+};
 // 翻页，改变分页大小
 const onTableChange = ({ current, pageSize }: Pagination) => {
   pagination.current = current;
   pagination.pageSize = pageSize;
-  getList();
+  getApiList();
 };
-// 刷新
-const onRefresh = () => {
-  getList();
-};
-// 新建
+// 新增
 const onCreate = () => {
   action.value = 'create';
+  currentItem.value = null;
   showModal.value = true;
 };
 // 编辑
-const onEdit = (record: TableListItem) => {
+const onEdit = (record: Api) => {
   action.value = 'edit';
   currentItem.value = record;
   showModal.value = true;
@@ -134,17 +119,17 @@ const onCancel = () => {
 };
 const onOk = () => {
   showModal.value = false;
-  getList();
+  getApiList();
 };
 // 勾选
 const onSelectChange = (keys: number[]) => {
   selectedRowKeys.value = keys;
 };
 // 删除
-const onRemove = (record: TableListItem) => {
+const onRemove = (record: Api) => {
   const title = selectedRowKeys.value.includes(record.id)
-    ? `确定删除选中的【${selectedRowKeys.value.length}项】吗？`
-    : '确定删除当前项吗？';
+    ? `确定删除选中的【${selectedRowKeys.value.length}项】API吗？`
+    : '确定删除当前API吗？';
   ConfirmModal.error({
     title,
     onOk: async () => {
@@ -156,22 +141,12 @@ const onRemove = (record: TableListItem) => {
           resolve();
         }, 1000);
       });
-      getList();
+      getApiList();
     }
   });
 };
 
-getList();
+getApiList();
 </script>
 
-<style scoped lang="less">
-.table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  .table-settings {
-    margin-left: 24px;
-    font-size: 16px;
-  }
-}
-</style>
+<style scoped></style>
