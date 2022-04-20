@@ -15,11 +15,16 @@ export const useRouterStore = defineStore('router', {
     };
   },
   getters: {
+    // 菜单栏渲染列表
     menus(): RouteRecordRaw[] {
       return this.routes[0].children || [];
     }
   },
   actions: {
+    /**
+     * @desc 递归生成动态路由表
+     * @param menus 后端获取到的菜单列表
+     */
     setAsyncRoutes(menus: MenuItem[]) {
       const modules = import.meta.glob('../**/*.vue');
       const routes: RouteRecordRaw[] = [];
@@ -37,6 +42,10 @@ export const useRouterStore = defineStore('router', {
       }
       return routes;
     },
+    /**
+     * @desc 生成动态路由表，并将动态路由表合并到总路由表
+     * @param menus 后端获取到的菜单列表
+     */
     generateRoutes(menus: MenuItem[]) {
       const asyncRoutes = [constantRoutes[0]];
       asyncRoutes[0].children = this.setAsyncRoutes(menus);

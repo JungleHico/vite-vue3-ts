@@ -951,7 +951,226 @@ Vue Router4 中，路由守卫是异步解析执行，此时导航在所有守�
 
 ## 权限管理
 
-### 图标动态导入（ant-design-vue）
+权限管理基于**角色管理**，为不同的用户分配不同的角色，不同角色能够访问的页面（**路由权限**）和接口（**接口权限**）都是不同的。
+
+![role](./docs/images/role.png)
+
+### 路由权限/菜单管理及菜单栏
+
+路由权限有两种实现方法，一种是前端配置，一种是后端配置，本项目采用后端配置路由表的方式。
+
+#### 前端配置路由表
+
+1. 后端应该提供 `roles[]` 字段，前端登录后可以获取到用户所属角色。
+2. 前端实现通用路由表，这个路由表是静态的，包含不需要登录就可以访问的公共页面，例如：登录页、404 页面等。
+3. 准备动态路由表，路由表通过 `meta.roles` 字段指定允许访问的角色。
+4. 用户登录后，根据 `roles` 比对动态路由表，筛选出可以访问的动态路由表，通过 `router.addRoute()` 添加路由表。
+
+#### 后端配置路由表
+
+1. 前端实现通用路由表，这个路由表是静态的，包含不需要登录就可以访问的公共页面，例如：登录页、404 页面等。
+
+2. 后台需要支持配置路由表，并且设置角色的路由权限：
+
+![menu](./docs/images/menu.png)
+
+![roleMenu](./docs/images/roleMenu.png)
+
+3. 用户登录后，获取用户有权访问的（动态）路由表。
+
+4. 通过 `router.addRoute()` 添加动态路由表。
+
+5. 匹配其他路由，重定向到 404 页面。
+
+**实现过程**
+
+首先，准备通用路由表：
+
+```typescript
+// src/router/index.ts
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import LayoutMain from '@/layouts/LayoutMain.vue';
+
+// 通用路由表
+export const constantRoutes: RouteRecordRaw[] = [
+  {
+    path: '/',
+    component: LayoutMain,
+    name: 'home',
+    redirect: '/welcome',
+    meta: { title: '首页' },
+    children: []
+  },
+  {
+    path: '/login',
+    component: () => import('@/views/Login.vue'),
+    name: 'login',
+    meta: { hidden: true }
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/exception/404.vue'),
+    meta: { hidden: true }
+  }
+];
+
+const router = createRouter({
+  history: createWebHistory(''),
+  routes: constantRoutes
+});
+```
+
+然后，创建一个 store，用来管理路由表：
+
+```typescript
+// src/store/routerStore.ts
+import { defineStore } from 'pinia';
+import { RouteRecordRaw } from 'vue-router';
+import { constantRoutes } from '@/router/index';
+
+type RouterStoreState = {
+  routes: RouteRecordRaw[]; // 总路由表
+  asyncRoutes: RouteRecordRaw[]; // 动态添加的路由表
+};
+
+export const useRouterStore = defineStore('router', {
+  state: (): RouterStoreState => {
+    return {
+      routes: constantRoutes,
+      asyncRoutes: []
+    };
+  },
+  getters: {
+    // 菜单栏渲染列表
+    menus(): RouteRecordRaw[] {
+      return this.routes[0].children || [];
+    }
+  },
+  actions: {
+    /**
+     * @desc 递归生成动态路由表
+     * @param menus 后端获取到的菜单列表
+     */
+    setAsyncRoutes(menus: MenuItem[]) {
+      const modules = import.meta.glob('../**/*.vue');
+      const routes: RouteRecordRaw[] = [];
+      for (const item of menus) {
+        const route: RouteRecordRaw = {
+          path: item.path,
+          component: markRaw(modules[`../${item.component}`]),
+          meta: item.meta,
+          redirect: item.redirect
+        };
+        if (item.children) {
+          route.children = this.setAsyncRoutes(item.children);
+        }
+        routes.push(route);
+      }
+      return routes;
+    },
+    /**
+     * @desc 生成动态路由表，并将动态路由表合并到总路由表
+     * @param menus 后端获取到的菜单列表
+     */
+    generateRoutes(menus: MenuItem[]) {
+      const asyncRoutes = [constantRoutes[0]];
+      asyncRoutes[0].children = this.setAsyncRoutes(menus);
+      this.asyncRoutes = asyncRoutes;
+      this.routes.splice(0, 1, asyncRoutes[0]);
+    }
+  }
+});
+```
+
+> 我们将动态路由表添加到 `'home'` 路由的 `children`中，这个子路由也会被作为菜单栏进行渲染。
+
+然后，在路由守卫中，登录获取动态路由表/菜单列表，添加到路由中：
+
+```diff
+  // src/router/index.ts
++ import { useLoginStore } from '@/store/loginStore';
++ import { getUserMenu } from '@/api/login';
+
+  // ...
+
+  // 免登录白名单
+  const whiteList = ['/login', '/404'];
+
++ // 获取用户路由表
++ const getRoutes = async () => {
++   const routerStore = useRouterStore();
++   const menus = await getUserMenu();
++   routerStore.generateRoutes(menus);
++   // 动态添加路由
++   if (routerStore.asyncRoutes[0]?.children) {
++     routerStore.asyncRoutes[0].children.forEach((route: RouteRecordRaw) => {
++       // 将动态路由表添加到 'home' 的子路由
++       router.addRoute('home', route);
++     });
++   }
++   // 匹配其他路由，重定向到404
++   router.addRoute({
++     path: '/:pathMatch(.*)*',
++     redirect: '/404'
++   });
++ };
+
+  // 路由守卫，登录拦截
+  router.beforeEach(async (to, from) => {
+    NProgress.start();
+    const token = localStorage.getItem('token');
+    if (token) {
+      // 有token
+      const loginStore = useLoginStore();
+      if (loginStore.info) {
+        // 有用户信息，说明已登录
+        if (to.path === '/login') {
+          // 如果是登录页，则重定向到首页
+          return '/';
+        }
+        return true;
+      }
+      // 有token，无用户信息（刷新页面）
+      try {
+        await loginStore.getUserInfo();
+-       return true;
++       // 获取用户路由表
++       await getRoutes();
++       // 重定向到当前页面，避免路由未更新
++       return { ...to, replace: true };
+      } catch (error) {
+        loginStore.logout();
+        return '/login';
+      }
+    } else {
+      // 无token（未登录/退出登录）
+      if (whiteList.includes(to.path)) {
+        // 免登录白名单，正常访问（避免死循环）
+        return true;
+      }
+      // 重定向到登录页
+      return '/login';
+    }
+  });
+```
+
+**菜单栏的实现**
+
+菜单栏基于路由权限（`routerStore.menus`），只有用户有权访问的页面，才会在侧边栏的菜单中出现。
+
+菜单栏组件可以参考： [导航菜单 Menu - Ant Design Vue](https://www.antdv.com/components/menu-cn) 。
+
+菜单栏一般不会显示整个路由表，而是选取 `'home'` 路由的 `children`。
+
+菜单项由 `<router-link>` 构成，点击跳转到对应的页面，除此之外，还应该监听路由的变化，根据路由展开/高亮对应的菜单。
+
+### 接口权限
+
+一般地，如果用户没有权限访问某个接口，应当返回 403 状态码。为此，后台需要配置 API 列表，并且设置角色的接口权限。
+
+![api](./docs/images/api.png)
+
+![roleApi](./docs/images/roleApi.png)
 
 ## 打包分析
 
