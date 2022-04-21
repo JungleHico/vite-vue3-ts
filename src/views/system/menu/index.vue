@@ -1,27 +1,20 @@
 <template>
-  <div class="table-wrapper" ref="tableRef">
-    <a-table
+  <div class="table-wrapper" ref="tableContainer">
+    <custom-table
       :columns="menuColumns"
       :data-source="menuList"
       :loading="loading"
       :pagination="pagination"
-      :size="tableSize"
+      toolbar-title="菜单管理"
+      create-button-text="新增根菜单"
+      :table-container="tableContainer"
       :row-key="setRowKey"
       :expanded-row-keys="expandedRowKeys"
       @expand="onExpand"
+      @create="onCreate"
+      @refresh="onRefresh"
       @change="onTableChange"
     >
-      <template #title>
-        <table-toolbar
-          title="菜单管理"
-          v-model:size="tableSize"
-          create-button-text="新增根菜单"
-          :table-ref="tableRef"
-          @create="onCreate"
-          @refresh="onRefresh"
-        ></table-toolbar>
-      </template>
-
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'title'">
           {{ record.meta.title }}
@@ -52,7 +45,7 @@
           </a-space>
         </template>
       </template>
-    </a-table>
+    </custom-table>
   </div>
 
   <menu-modal
@@ -67,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import TableToolbar from '@/components/TabToolbar.vue';
+import CustomTable from '@/components/CustomTable.vue';
 import MenuModal from './MenuModal.vue';
 import AntIcon from '@/components/AntIcon.vue';
 import {
@@ -80,7 +73,7 @@ import { getMenu } from '@/api/permission';
 
 const menuList = ref<MenuItem[]>([]);
 const loading = ref<boolean>(false);
-const tableRef = ref();
+const tableContainer = ref();
 const pagination = reactive<Pagination>({
   current: 1,
   pageSize: 10,
@@ -118,7 +111,7 @@ const onRefresh = () => {
   getMenuList();
 };
 // 翻页，改变分页大小
-const onTableChange = ({ current, pageSize }: Pagination) => {
+const onTableChange = ({ current, pageSize }: any) => {
   pagination.current = current;
   pagination.pageSize = pageSize;
   getMenuList();

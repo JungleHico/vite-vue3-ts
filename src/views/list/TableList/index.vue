@@ -1,29 +1,21 @@
 <template>
-  <div class="table-wrapper" ref="tableRef">
-    <a-table
+  <div class="table-wrapper" ref="tableContainer">
+    <custom-table
       :columns="columns"
       :data-source="tableList"
       :pagination="pagination"
       :loading="loading"
-      :size="tableSize"
+      toolbar-title="查询表格"
+      :table-container="tableContainer"
       :row-key="setRowKey"
       :row-selection="{
         selectedRowKeys: selectedRowKeys,
         onChange: onSelectChange
       }"
+      @create="onCreate"
+      @refresh="onRefresh"
       @change="onTableChange"
     >
-      <template #title>
-        <table-toolbar
-          title="查询表格"
-          v-model:size="tableSize"
-          :table-ref="tableRef"
-          @create="onCreate"
-          @refresh="onRefresh"
-        >
-        </table-toolbar>
-      </template>
-
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'status'">
           <a-badge
@@ -40,7 +32,7 @@
           </a-space>
         </template>
       </template>
-    </a-table>
+    </custom-table>
   </div>
 
   <table-list-modal
@@ -54,14 +46,14 @@
 </template>
 
 <script setup lang="ts">
-import TableToolbar from '@/components/TabToolbar.vue';
+import CustomTable from '@/components/CustomTable.vue';
 import TableListModal from './TableListModal.vue';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';
 import { columns } from '@/utils/table';
 import { getTableList } from '@/api/tableList';
 import ConfirmModal from '@/plugins/ConfirmModal';
 
-const tableRef = ref();
+const tableContainer = ref();
 const tableList = ref<TableListItem[]>([]);
 const pagination = reactive<Pagination>({
   current: 1,
@@ -109,7 +101,7 @@ const setRowKey = (record: Api) => {
 
 // events
 // 翻页，改变分页大小
-const onTableChange = ({ current, pageSize }: Pagination) => {
+const onTableChange = ({ current, pageSize }: any) => {
   pagination.current = current;
   pagination.pageSize = pageSize;
   getList();

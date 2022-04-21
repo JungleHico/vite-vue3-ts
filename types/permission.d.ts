@@ -1,10 +1,3 @@
-// declare type Permission = {
-//   id: number;
-//   key: string;
-//   name: string;
-//   actions: string[];
-// };
-
 declare type Api = {
   id: number;
   path: string;
@@ -28,4 +21,13 @@ declare type Role = {
   id: number;
   name: string;
   desc: string;
+};
+
+declare type User = {
+  id: number;
+  account: string;
+  username: string;
+  avatar: string;
+  phone: string;
+  roles: string[];
 };

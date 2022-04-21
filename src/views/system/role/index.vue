@@ -1,24 +1,17 @@
 <template>
-  <div class="table-wrapper" ref="tableRef">
-    <a-table
+  <div class="table-wrapper" ref="tableContainer">
+    <custom-table
       :columns="rolesColumns"
       :data-source="roleList"
       :loading="loading"
       :pagination="pagination"
-      :size="tableSize"
+      toolbar-title="角色管理"
+      create-button-text="新增角色"
+      :table-container="tableContainer"
+      @create="onCreate"
+      @refresh="onRefresh"
       @change="onTableChange"
     >
-      <template #title>
-        <table-toolbar
-          title="角色管理"
-          v-model:size="tableSize"
-          create-button-text="新增角色"
-          :table-ref="tableRef"
-          @create="onCreate"
-          @refresh="onRefresh"
-        ></table-toolbar>
-      </template>
-
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'action'">
           <a-space size="middle">
@@ -38,7 +31,7 @@
           </a-space>
         </template>
       </template>
-    </a-table>
+    </custom-table>
   </div>
 
   <role-modal
@@ -61,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import TableToolbar from '@/components/TabToolbar.vue';
+import CustomTable from '@/components/CustomTable.vue';
 import RoleModal from './RoleModal.vue';
 import AuthorityModal from './AuthorityModal/index.vue';
 import {
@@ -74,7 +67,7 @@ import { getRoles } from '@/api/permission';
 
 const roleList = ref<Role[]>([]);
 const loading = ref<boolean>(false);
-const tableRef = ref();
+const tableContainer = ref();
 const tableSize = ref<TableSize>('default');
 const pagination = reactive<Pagination>({
   current: 1,
@@ -113,7 +106,7 @@ const onRefresh = () => {
   getRoleList();
 };
 // 翻页，改变分页大小
-const onTableChange = ({ current, pageSize }: Pagination) => {
+const onTableChange = ({ current, pageSize }: any) => {
   pagination.current = current;
   pagination.pageSize = pageSize;
   getRoleList();

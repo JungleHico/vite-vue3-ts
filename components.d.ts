@@ -60,6 +60,7 @@ declare module '@vue/runtime-core' {
     ATreeSelect: typeof import('ant-design-vue/es')['TreeSelect']
     AUpload: typeof import('ant-design-vue/es')['Upload']
     CumtomTable: typeof import('./src/components/CumtomTable.vue')['default']
+    CustomTable: typeof import('./src/components/CustomTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TabToolbar: typeof import('./src/components/TabToolbar.vue')['default']

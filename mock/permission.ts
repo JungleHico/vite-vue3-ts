@@ -1,4 +1,5 @@
 import { MockMethod } from 'vite-plugin-mock';
+import { Random } from 'mockjs';
 
 const apiList = [
   {
@@ -264,8 +265,34 @@ const menu = [
         parentId: 9,
         sort: 2,
         component: 'views/system/role/index.vue'
+      },
+      {
+        id: 16,
+        name: 'user',
+        path: '/system/user',
+        meta: {
+          title: '用户管理',
+          icon: '',
+          hidden: false
+        },
+        parentId: 9,
+        sort: 2,
+        component: 'views/system/user/index.vue'
       }
     ]
+  }
+];
+
+const roles = [
+  {
+    id: 1,
+    name: 'admin',
+    desc: '管理员角色'
+  },
+  {
+    id: 2,
+    name: 'vip',
+    desc: '会员角色'
   }
 ];
 
@@ -352,27 +379,31 @@ export default [
     }: MockRequestOptions): BaseResponse<ResponseList<Role>> => {
       const current = query.current ? +query.current : 1;
       const pageSize = query.pageSize ? +query.pageSize : 10;
-      const list = [
-        {
-          id: 1,
-          name: 'admin',
-          desc: '管理员角色'
-        },
-        {
-          id: 2,
-          name: 'vip',
-          desc: '会员角色'
-        }
-      ];
 
       return {
         code: 0,
         data: {
-          list: list.slice((current - 1) * pageSize, current * pageSize),
-          total: list.length,
+          list: roles.slice((current - 1) * pageSize, current * pageSize),
+          total: roles.length,
           pageSize,
           current
         },
+        message: 'success'
+      };
+    }
+  },
+  // 获取所有角色
+  {
+    url: '/api/allRoles',
+    method: 'get',
+    timeout: 500,
+    response: ({ query }: MockRequestOptions): BaseResponse<Role[]> => {
+      const current = query.current ? +query.current : 1;
+      const pageSize = query.pageSize ? +query.pageSize : 10;
+
+      return {
+        code: 0,
+        data: roles,
         message: 'success'
       };
     }
@@ -424,6 +455,40 @@ export default [
       return {
         code: 0,
         data: list,
+        message: 'success'
+      };
+    }
+  },
+  // 获取用户列表
+  {
+    url: '/api/users',
+    method: 'get',
+    timeout: 500,
+    response: ({
+      query
+    }: MockRequestOptions): BaseResponse<ResponseList<User>> => {
+      const current = query.current ? +query.current : 1;
+      const pageSize = query.pageSize ? +query.pageSize : 10;
+
+      const list = [
+        {
+          id: 1,
+          account: 'admin',
+          username: '超级管理员',
+          avatar: Random.image('100x100', '#ccc', '#f00', 'a'),
+          phone: '13111111111',
+          roles: ['admin']
+        }
+      ];
+
+      return {
+        code: 0,
+        data: {
+          list: list.slice((current - 1) * pageSize, current * pageSize),
+          total: list.length,
+          pageSize,
+          current
+        },
         message: 'success'
       };
     }

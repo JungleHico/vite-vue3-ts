@@ -78,6 +78,7 @@ type Emits = {
 };
 
 const props = withDefaults(defineProps<Props>(), {
+  title: '',
   createButton: true,
   createButtonText: '新建',
   refresh: true,
@@ -116,6 +117,8 @@ const onFullscreen = () => {
         props.tableRef.requestFullscreen();
       }
     }
+  } else {
+    console.warn('Fullscreen require props: tableRef');
   }
 };
 // 全屏/退出全屏事件监听

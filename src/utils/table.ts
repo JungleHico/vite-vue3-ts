@@ -115,3 +115,35 @@ export const rolesColumns = [
     dataIndex: 'action'
   }
 ];
+
+// 用户列表
+export const userColumns = [
+  {
+    title: 'ID',
+    dataIndex: 'id'
+  },
+  {
+    title: '头像',
+    dataIndex: 'avatar'
+  },
+  {
+    title: '帐号',
+    dataIndex: 'account'
+  },
+  {
+    title: '用户名',
+    dataIndex: 'username'
+  },
+  {
+    title: '手机号',
+    dataIndex: 'phone'
+  },
+  {
+    title: '用户角色',
+    dataIndex: 'roles'
+  },
+  {
+    title: '操作',
+    dataIndex: 'action'
+  }
+];

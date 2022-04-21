@@ -54,7 +54,8 @@ const loginServices: MockMethod[] = [
       return {
         code: 0,
         data: {
-          username: 'admin',
+          account: 'admin',
+          username: '超级管理员',
           avatar: Random.image('100x100', '#ccc', '#f00', 'a')
         },
         message: 'success'
@@ -272,6 +273,19 @@ const loginServices: MockMethod[] = [
               parentId: 9,
               sort: 2,
               component: 'views/system/role/index.vue'
+            },
+            {
+              id: 16,
+              name: 'user',
+              path: '/system/user',
+              meta: {
+                title: '用户管理',
+                icon: '',
+                hidden: false
+              },
+              parentId: 9,
+              sort: 2,
+              component: 'views/system/user/index.vue'
             }
           ]
         }

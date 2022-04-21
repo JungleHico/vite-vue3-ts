@@ -8,6 +8,7 @@ declare type Token = {
 };
 
 declare type UserInfo = {
+  account: string;
   username: string;
   avatar: string;
 };
