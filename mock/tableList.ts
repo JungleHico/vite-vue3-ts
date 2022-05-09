@@ -1,5 +1,6 @@
 import { MockMethod } from 'vite-plugin-mock';
 import Mock from 'mockjs';
+import JsonWebToken from './JsonWebToken';
 
 export default [
   // 获取“查询表格”数据
@@ -8,8 +9,9 @@ export default [
     method: 'get',
     timeout: 500,
     response: ({
-      query
-    }: MockRequestOptions): BaseResponse<ResponseList<TableListItem>> => {
+      query,
+      headers
+    }: MockRequestOptions): BaseResponse<ResponseList<TableListItem> | null> => {
       const current = query.current ? +query.current : 1;
       const pageSize = query.pageSize ? +query.pageSize : 10;
 
@@ -24,16 +26,15 @@ export default [
         ]
       });
 
-      return {
-        code: 0,
-        data: {
+      return JsonWebToken.getAuthData<ResponseList<TableListItem>>(
+        headers.authorization,
+        {
           list: data.list,
           total: 100,
           pageSize: 10,
           current: 1
-        },
-        message: 'success'
-      };
+        }
+      );
     }
   }
 ] as MockMethod[];

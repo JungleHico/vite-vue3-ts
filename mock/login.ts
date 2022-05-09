@@ -1,6 +1,7 @@
 import md5 from 'blueimp-md5';
 import { MockMethod } from 'vite-plugin-mock';
 import { Random } from 'mockjs';
+import JsonWebToken from './JsonWebToken';
 
 const loginServices: MockMethod[] = [
   // 登录
@@ -12,7 +13,6 @@ const loginServices: MockMethod[] = [
       const { account, password } = body;
       const users = [{ account: 'admin', password: md5('1234') }];
       let pass = false;
-      console.log(password, users[0].password);
       for (const user of users) {
         if (account === user.account && password === user.password) {
           pass = true;
@@ -30,7 +30,7 @@ const loginServices: MockMethod[] = [
       return {
         code: 0,
         data: {
-          token: Random.word()
+          token: JsonWebToken.generateToken({ account })
         },
         message: 'success'
       };
@@ -44,22 +44,13 @@ const loginServices: MockMethod[] = [
     response: ({
       headers
     }: MockRequestOptions): BaseResponse<UserInfo | null> => {
-      if (!headers.authorization) {
-        return {
-          code: 401,
-          data: null,
-          message: '鉴权失败'
-        };
-      }
-      return {
-        code: 0,
-        data: {
-          account: 'admin',
-          username: '超级管理员',
-          avatar: Random.image('100x100', '#ccc', '#f00', 'a')
-        },
-        message: 'success'
+      const data = {
+        account: 'admin',
+        username: '超级管理员',
+        avatar: Random.image('100x100', '#ccc', '#f00', 'a')
       };
+
+      return JsonWebToken.getAuthData<UserInfo>(headers.authorization, data);
     }
   },
   // 获取用户菜单列表
@@ -67,7 +58,9 @@ const loginServices: MockMethod[] = [
     url: '/api/userMenu',
     method: 'get',
     timeout: 500,
-    response: (): BaseResponse<MenuItem[]> => {
+    response: ({
+      headers
+    }: MockRequestOptions): BaseResponse<MenuItem[] | null> => {
       const list = [
         {
           id: 1,
@@ -291,11 +284,7 @@ const loginServices: MockMethod[] = [
         }
       ];
 
-      return {
-        code: 0,
-        data: list,
-        message: 'success'
-      };
+      return JsonWebToken.getAuthData<MenuItem[]>(headers.authorization, list);
     }
   }
 ];

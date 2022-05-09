@@ -13,6 +13,7 @@
     "axios": "^0.26.1",
     "blueimp-md5": "^2.19.0",
     "dayjs": "^1.11.0",
+    "jsonwebtoken": "^8.5.1",
     "mockjs": "^1.1.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.13",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@types/blueimp-md5": "^2.18.0",
+    "@types/jsonwebtoken": "^8.5.8",
     "@types/node": "^17.0.23",
     "@types/nprogress": "^0.2.0",
     "@vitejs/plugin-vue": "^2.2.0",

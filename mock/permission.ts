@@ -1,5 +1,6 @@
 import { MockMethod } from 'vite-plugin-mock';
 import { Random } from 'mockjs';
+import JsonWebToken from './JsonWebToken';
 
 const apiList = [
   {
@@ -303,21 +304,23 @@ export default [
     method: 'get',
     timeout: 500,
     response: ({
-      query
-    }: MockRequestOptions): BaseResponse<ResponseList<Api>> => {
+      query,
+      headers
+    }: MockRequestOptions): BaseResponse<ResponseList<Api> | null> => {
       const current = query.current ? +query.current : 1;
       const pageSize = query.pageSize ? +query.pageSize : 10;
 
-      return {
-        code: 0,
-        data: {
-          list: apiList.slice((current - 1) * pageSize, current * pageSize),
-          total: apiList.length,
-          pageSize,
-          current
-        },
-        message: 'success'
+      const data = {
+        list: apiList.slice((current - 1) * pageSize, current * pageSize),
+        total: apiList.length,
+        pageSize,
+        current
       };
+
+      return JsonWebToken.getAuthData<ResponseList<Api>>(
+        headers.authorization,
+        data
+      );
     }
   },
   // 获取所有api
@@ -325,12 +328,8 @@ export default [
     url: '/api/allApis',
     method: 'get',
     timeout: 500,
-    response: (): BaseResponse<Api[]> => {
-      return {
-        code: 0,
-        data: apiList,
-        message: 'success'
-      };
+    response: ({ headers }: MockRequestOptions): BaseResponse<Api[] | null> => {
+      return JsonWebToken.getAuthData<Api[]>(headers.authorization, apiList);
     }
   },
   // 获取菜单列表
@@ -339,21 +338,23 @@ export default [
     method: 'get',
     timeout: 500,
     response: ({
-      query
-    }: MockRequestOptions): BaseResponse<ResponseList<MenuItem>> => {
+      query,
+      headers
+    }: MockRequestOptions): BaseResponse<ResponseList<MenuItem> | null> => {
       const current = query.current ? +query.current : 1;
       const pageSize = query.pageSize ? +query.pageSize : 10;
 
-      return {
-        code: 0,
-        data: {
-          list: menu.slice((current - 1) * pageSize, current * pageSize),
-          total: menu.length,
-          pageSize,
-          current
-        },
-        message: 'success'
+      const data = {
+        list: menu.slice((current - 1) * pageSize, current * pageSize),
+        total: menu.length,
+        pageSize,
+        current
       };
+
+      return JsonWebToken.getAuthData<ResponseList<MenuItem>>(
+        headers.authorization,
+        data
+      );
     }
   },
   // 获取完整菜单
@@ -361,12 +362,10 @@ export default [
     url: '/api/wholeMenu',
     method: 'get',
     timeout: 500,
-    response: (): BaseResponse<MenuItem[]> => {
-      return {
-        code: 0,
-        data: menu,
-        message: 'success'
-      };
+    response: ({
+      headers
+    }: MockRequestOptions): BaseResponse<MenuItem[] | null> => {
+      return JsonWebToken.getAuthData<MenuItem[]>(headers.authorization, menu);
     }
   },
   // 获取角色列表
@@ -375,21 +374,23 @@ export default [
     method: 'get',
     timeout: 500,
     response: ({
-      query
-    }: MockRequestOptions): BaseResponse<ResponseList<Role>> => {
+      query,
+      headers
+    }: MockRequestOptions): BaseResponse<ResponseList<Role> | null> => {
       const current = query.current ? +query.current : 1;
       const pageSize = query.pageSize ? +query.pageSize : 10;
 
-      return {
-        code: 0,
-        data: {
-          list: roles.slice((current - 1) * pageSize, current * pageSize),
-          total: roles.length,
-          pageSize,
-          current
-        },
-        message: 'success'
+      const data = {
+        list: roles.slice((current - 1) * pageSize, current * pageSize),
+        total: roles.length,
+        pageSize,
+        current
       };
+
+      return JsonWebToken.getAuthData<ResponseList<Role>>(
+        headers.authorization,
+        data
+      );
     }
   },
   // 获取所有角色
@@ -397,15 +398,10 @@ export default [
     url: '/api/allRoles',
     method: 'get',
     timeout: 500,
-    response: ({ query }: MockRequestOptions): BaseResponse<Role[]> => {
-      const current = query.current ? +query.current : 1;
-      const pageSize = query.pageSize ? +query.pageSize : 10;
-
-      return {
-        code: 0,
-        data: roles,
-        message: 'success'
-      };
+    response: ({
+      headers
+    }: MockRequestOptions): BaseResponse<Role[] | null> => {
+      return JsonWebToken.getAuthData<Role[]>(headers.authorization, roles);
     }
   },
   // 获取角色菜单权限
@@ -414,8 +410,9 @@ export default [
     method: 'get',
     timeout: 500,
     response: ({
-      query
-    }: MockRequestOptions): BaseResponse<ResponseList<number>> => {
+      query,
+      headers
+    }: MockRequestOptions): BaseResponse<ResponseList<number> | null> => {
       let list: number[] = [];
       const list1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
       const list2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
@@ -425,16 +422,17 @@ export default [
         list = list2;
       }
 
-      return {
-        code: 0,
-        data: {
-          list,
-          total: list.length,
-          pageSize: 10,
-          current: 1
-        },
-        message: 'success'
+      const data = {
+        list,
+        total: list.length,
+        pageSize: 10,
+        current: 1
       };
+
+      return JsonWebToken.getAuthData<ResponseList<number>>(
+        headers.authorization,
+        data
+      );
     }
   },
   // 获取角色API权限
@@ -442,7 +440,10 @@ export default [
     url: '/api/apiAuthority',
     method: 'get',
     timeout: 500,
-    response: ({ query }: MockRequestOptions): BaseResponse<number[]> => {
+    response: ({
+      query,
+      headers
+    }: MockRequestOptions): BaseResponse<number[] | null> => {
       let list: number[] = [];
       const list1 = [1, 2, 3, 4, 5, 6, 7, 8];
       const list2 = [1, 2, 3, 4];
@@ -452,11 +453,7 @@ export default [
         list = list2;
       }
 
-      return {
-        code: 0,
-        data: list,
-        message: 'success'
-      };
+      return JsonWebToken.getAuthData<number[]>(headers.authorization, list);
     }
   },
   // 获取用户列表
@@ -465,8 +462,9 @@ export default [
     method: 'get',
     timeout: 500,
     response: ({
-      query
-    }: MockRequestOptions): BaseResponse<ResponseList<User>> => {
+      query,
+      headers
+    }: MockRequestOptions): BaseResponse<ResponseList<User> | null> => {
       const current = query.current ? +query.current : 1;
       const pageSize = query.pageSize ? +query.pageSize : 10;
 
@@ -481,16 +479,17 @@ export default [
         }
       ];
 
-      return {
-        code: 0,
-        data: {
-          list: list.slice((current - 1) * pageSize, current * pageSize),
-          total: list.length,
-          pageSize,
-          current
-        },
-        message: 'success'
+      const data = {
+        list: list.slice((current - 1) * pageSize, current * pageSize),
+        total: list.length,
+        pageSize,
+        current
       };
+
+      return JsonWebToken.getAuthData<ResponseList<User>>(
+        headers.authorization,
+        data
+      );
     }
   }
 ] as MockMethod[];
