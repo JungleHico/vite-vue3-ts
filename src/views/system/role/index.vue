@@ -3,7 +3,6 @@
     <custom-table
       :columns="rolesColumns"
       :data-source="roleList"
-      :loading="loading"
       :pagination="pagination"
       toolbar-title="角色管理"
       create-button-text="新增角色"
@@ -66,7 +65,6 @@ import { rolesColumns } from '@/utils/table';
 import { getRoles } from '@/api/permission';
 
 const roleList = ref<Role[]>([]);
-const loading = ref<boolean>(false);
 const tableContainer = ref();
 const tableSize = ref<TableSize>('default');
 const pagination = reactive<Pagination>({
@@ -83,7 +81,6 @@ const showAuthorityModal = ref<boolean>(false);
 const currentRoleId = ref<number>(0);
 
 const getRoleList = async () => {
-  loading.value = true;
   const params = {
     current: pagination.current,
     pageSize: pagination.pageSize
@@ -96,8 +93,6 @@ const getRoleList = async () => {
   } catch (error) {
     roleList.value = [];
     return Promise.reject(error);
-  } finally {
-    loading.value = false;
   }
 };
 
@@ -131,10 +126,8 @@ const onOk = () => {
 };
 // 删除
 const onRemove = (record: Role) => {
-  loading.value = true;
   // TODO 删除接口
   setTimeout(() => {
-    loading.value = false;
     getRoleList();
   }, 1000);
 };

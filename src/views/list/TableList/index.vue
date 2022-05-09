@@ -4,7 +4,6 @@
       :columns="columns"
       :data-source="tableList"
       :pagination="pagination"
-      :loading="loading"
       toolbar-title="查询表格"
       :table-container="tableContainer"
       :row-key="setRowKey"
@@ -60,7 +59,6 @@ const pagination = reactive<Pagination>({
   pageSize: 10,
   total: 0
 });
-const loading = ref<boolean>(false);
 const tableSize = ref<TableSize>('default');
 const selectedRowKeys = ref<number[]>([]); // 勾选的行
 // 弹窗
@@ -70,7 +68,6 @@ const currentItem = ref<TableListItem | null>(null);
 
 // methods
 const getList = async () => {
-  loading.value = true;
   const params = {
     current: pagination.current,
     pageSize: pagination.pageSize
@@ -83,8 +80,6 @@ const getList = async () => {
   } catch (error) {
     tableList.value = [];
     return Promise.reject(error);
-  } finally {
-    loading.value = false;
   }
 };
 // 获取状态

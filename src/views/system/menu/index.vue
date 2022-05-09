@@ -3,7 +3,6 @@
     <custom-table
       :columns="menuColumns"
       :data-source="menuList"
-      :loading="loading"
       :pagination="pagination"
       toolbar-title="菜单管理"
       create-button-text="新增根菜单"
@@ -72,7 +71,6 @@ import { menuColumns } from '@/utils/table';
 import { getMenu } from '@/api/permission';
 
 const menuList = ref<MenuItem[]>([]);
-const loading = ref<boolean>(false);
 const tableContainer = ref();
 const pagination = reactive<Pagination>({
   current: 1,
@@ -87,7 +85,6 @@ const action = ref<Action>('create');
 const currentItem = ref<MenuItem | null>(null);
 
 const getMenuList = async () => {
-  loading.value = true;
   const params = {
     current: pagination.current,
     pageSize: pagination.pageSize
@@ -100,8 +97,6 @@ const getMenuList = async () => {
   } catch (error) {
     menuList.value = [];
     return Promise.reject(error);
-  } finally {
-    loading.value = false;
   }
 };
 const setRowKey = (record: Role) => record.id;
@@ -152,10 +147,8 @@ const onOk = () => {
 };
 // 删除
 const onRemove = (record: MenuItem) => {
-  loading.value = true;
   // TODO 删除接口
   setTimeout(() => {
-    loading.value = false;
     getMenuList();
   }, 1000);
 };

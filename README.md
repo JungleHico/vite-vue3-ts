@@ -376,8 +376,8 @@ export default Request.getInstance();
 
 有些时候，我们需要对请求进行统一配置，例如：
 
-- 请求拦截：在请求头中统一添加鉴权 `token`
-- 响应拦截：对接口错误信息统一进行显示
+- 请求拦截：在请求头中统一添加鉴权 `token` ，显示全局 loading 等
+- 响应拦截：对接口错误信息统一进行显示（Notification，Message 之类的组件），隐藏全局 loading 等
 
 ```diff
   import axios, {

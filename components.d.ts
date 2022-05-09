@@ -61,6 +61,7 @@ declare module '@vue/runtime-core' {
     AUpload: typeof import('ant-design-vue/es')['Upload']
     CumtomTable: typeof import('./src/components/CumtomTable.vue')['default']
     CustomTable: typeof import('./src/components/CustomTable.vue')['default']
+    CustomUpload: typeof import('./src/components/CustomUpload.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TabToolbar: typeof import('./src/components/TabToolbar.vue')['default']

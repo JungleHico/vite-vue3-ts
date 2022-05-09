@@ -3,7 +3,6 @@
     <custom-table
       :columns="userColumns"
       :data-source="userList"
-      :loading="loading"
       :pagination="pagination"
       toolbar-title="用户管理"
       create-button-text="新增用户"
@@ -49,7 +48,6 @@ import { getUsers } from '@/api/permission';
 
 const tableContainer = ref(); // 表格容器
 const userList = ref<User[]>([]);
-const loading = ref<boolean>(false);
 const pagination = reactive<Pagination>({
   current: 1,
   pageSize: 10,
@@ -61,7 +59,6 @@ const action = ref<Action>('create');
 const currentItem = ref<User | null>(null);
 
 const getUserList = async () => {
-  loading.value = true;
   const params = {
     current: pagination.current,
     pageSize: pagination.pageSize
@@ -74,8 +71,6 @@ const getUserList = async () => {
   } catch (error) {
     userList.value = [];
     return Promise.reject(error);
-  } finally {
-    loading.value = false;
   }
 };
 

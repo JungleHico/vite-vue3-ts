@@ -6,6 +6,7 @@ import axios, {
 } from 'axios';
 import { notification } from 'ant-design-vue';
 import 'ant-design-vue/es/notification/style/css';
+import { useLoadingStore } from '@/store/loadingStore';
 import { useLoginStore } from '@/store/loginStore';
 
 class Request {
@@ -27,10 +28,21 @@ class Request {
     return this._instance;
   }
 
+  private showLoading() {
+    const loadingStore = useLoadingStore();
+    loadingStore.showLoading();
+  }
+
+  private hideLoading() {
+    const loadingStore = useLoadingStore();
+    loadingStore.hideLoading();
+  }
+
   // 请求拦截
   private setRequestInterceptors() {
     this._http.interceptors.request.use(
       (config: AxiosRequestConfig) => {
+        this.showLoading();
         // 请求头添加Authorization
         const token = localStorage.getItem('token');
         if (token) {
@@ -48,6 +60,7 @@ class Request {
   private setResponseInterceptors() {
     this._http.interceptors.response.use(
       <T>(response: AxiosResponse): Promise<T> => {
+        this.hideLoading();
         const { code, data, message }: BaseResponse<T> = response.data;
         if (code === 0) {
           return Promise.resolve(data);
@@ -65,6 +78,7 @@ class Request {
         return Promise.reject(message);
       },
       (error: any) => {
+        this.hideLoading();
         notification.error({
           message: '请求失败',
           description: error.message

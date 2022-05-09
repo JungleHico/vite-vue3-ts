@@ -1,11 +1,5 @@
 <template>
-  <a-modal
-    :visible="visible"
-    :title="title"
-    :confirm-loading="loading"
-    :mask-closable="false"
-    @ok="onOk"
-  >
+  <a-modal :visible="visible" :title="title" :mask-closable="false" @ok="onOk">
     <a-form v-bind="formItemLayout">
       <a-form-item v-if="action === 'edit'" label="ID">
         <a-input v-model:value="modelRef.id" disabled />
@@ -53,7 +47,6 @@ const emits = defineEmits<Emits>();
 const title = computed(() => {
   return props.action === 'create' ? '新增API' : '编辑API';
 });
-const loading = ref<boolean>(false);
 // 表单布局
 const formItemLayout = {
   labelCol: { span: 6 },
@@ -108,13 +101,7 @@ const onOk = () => {
     } else {
       // TODO 更新接口
     }
-
-    // 模拟接口
-    loading.value = true;
-    setTimeout(() => {
-      loading.value = false;
-      emits('ok');
-    }, 1000);
+    emits('ok');
   });
 };
 </script>

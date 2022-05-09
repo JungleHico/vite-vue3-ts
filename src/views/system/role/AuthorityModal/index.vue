@@ -1,11 +1,5 @@
 <template>
-  <a-modal
-    :visible="visible"
-    :mask-closable="false"
-    width="800px"
-    :confirm-loading="loading"
-    @ok="onOk"
-  >
+  <a-modal :visible="visible" :mask-closable="false" width="800px" @ok="onOk">
     <a-tabs v-model:activeKey="tabsKey" @change="onChangeTabs">
       <a-tab-pane key="1" tab="菜单权限">
         <a-spin :spinning="loadingMenuAuthority">
@@ -54,7 +48,6 @@ type Emits = {
 const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
 
-const loading = ref<boolean>(false);
 const tabsKey = ref<string>('1');
 
 /** 菜单 */
@@ -110,13 +103,7 @@ const onOk = () => {
   } else {
     // TODO API权限接口
   }
-
-  // 模拟接口
-  loading.value = true;
-  setTimeout(() => {
-    loading.value = false;
-    emits('ok');
-  }, 1000);
+  emits('ok');
 };
 
 getMenuList();

@@ -1,10 +1,5 @@
 <template>
-  <a-modal
-    :visible="visible"
-    :title="title"
-    :confirm-loading="loading"
-    @ok="onOk"
-  >
+  <a-modal :visible="visible" :title="title" @ok="onOk">
     <a-form v-bind="formItemLayout">
       <a-form-item label="ID">
         <a-input v-model:value="modelRef.id" disabled />
@@ -67,7 +62,6 @@ const formItemLayout = {
   labelCol: { span: 4 },
   wrapperCol: { span: 18 }
 };
-const loading = ref<boolean>(false);
 
 watch(
   () => props.visible,
@@ -94,13 +88,7 @@ const onOk = () => {
     } else {
       // TODO 更新数据
     }
-
-    // 模拟接口
-    loading.value = true;
-    setTimeout(() => {
-      loading.value = false;
-      emits('ok');
-    }, 1000);
+    emits('ok');
   });
 };
 </script>

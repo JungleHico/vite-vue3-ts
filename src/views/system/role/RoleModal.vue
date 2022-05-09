@@ -1,10 +1,5 @@
 <template>
-  <a-modal
-    :visible="visible"
-    :title="title"
-    :confirm-loading="loading"
-    @ok="onOk"
-  >
+  <a-modal :visible="visible" :title="title" @ok="onOk">
     <a-form layout="vertical">
       <a-form-item v-if="action === 'edit'" label="ID">
         <a-input v-model:value="modelRef.id" disabled />
@@ -44,7 +39,6 @@ const emits = defineEmits<Emits>();
 const title = computed(() => {
   return props.action === 'create' ? '新增角色' : '编辑角色';
 });
-const loading = ref<boolean>(false);
 // 表单数据
 const modelRef = reactive<FormState>({
   name: '',
@@ -87,13 +81,7 @@ const onOk = () => {
     } else {
       // TODO 更新数据
     }
-
-    // 模拟接口
-    loading.value = true;
-    setTimeout(() => {
-      loading.value = false;
-      emits('ok');
-    }, 1000);
+    emits('ok');
   });
 };
 </script>

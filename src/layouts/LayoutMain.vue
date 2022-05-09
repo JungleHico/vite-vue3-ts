@@ -6,7 +6,9 @@
       <a-layout-content class="layout-content">
         <page-header @refresh="onRefresh"></page-header>
         <div v-if="showContent" class="content">
-          <router-view></router-view>
+          <a-spin :spinning="loading" size="large">
+            <router-view></router-view>
+          </a-spin>
         </div>
       </a-layout-content>
     </a-layout>
@@ -17,7 +19,11 @@
 import Sidebar from './Sidebar/index.vue';
 import GlobalHeader from './GlobalHeader/index.vue';
 import PageHeader from './PageHeader/index.vue';
+import { useLoadingStore } from '@/store/loadingStore';
+import { storeToRefs } from 'pinia';
 
+const loadingStore = useLoadingStore();
+const { loading } = storeToRefs(loadingStore);
 const showContent = ref<boolean>(true);
 
 const onRefresh = () => {

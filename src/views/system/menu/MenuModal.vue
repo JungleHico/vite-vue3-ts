@@ -1,10 +1,5 @@
 <template>
-  <a-modal
-    :visible="visible"
-    :title="title"
-    :confirm-loading="loading"
-    @ok="onOk"
-  >
+  <a-modal :visible="visible" :title="title" @ok="onOk">
     <a-form v-bind="formItemLayout">
       <a-form-item v-if="action === 'edit'" label="ID">
         <a-input v-model:value="modelRef.id" disabled />
@@ -109,7 +104,6 @@ const title = computed(() => {
       : '新增根菜单'
     : '编辑菜单';
 });
-const loading = ref<boolean>(false);
 // 表单布局
 const formItemLayout = {
   labelCol: { span: 6 },
@@ -211,13 +205,7 @@ const onOk = () => {
     } else {
       // TODO 更新接口
     }
-
-    // 模拟接口
-    loading.value = true;
-    setTimeout(() => {
-      loading.value = false;
-      emits('ok');
-    }, 1000);
+    emits('ok');
   });
 };
 </script>

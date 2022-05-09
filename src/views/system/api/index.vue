@@ -3,7 +3,6 @@
     <custom-table
       :columns="apiColumns"
       :data-source="apiList"
-      :loading="loading"
       :pagination="pagination"
       toolbar-title="API管理"
       create-button-text="新增API"
@@ -48,7 +47,6 @@ import { getApis } from '@/api/permission';
 import ConfirmModal from '@/plugins/ConfirmModal';
 
 const apiList = ref<Api[]>([]);
-const loading = ref<boolean>(false);
 const tableContainer = ref();
 const tableSize = ref<TableSize>('default');
 const pagination = reactive<Pagination>({
@@ -63,7 +61,6 @@ const action = ref<Action>('create');
 const currentItem = ref<Api | null>(null);
 
 const getApiList = async () => {
-  loading.value = true;
   const params = {
     current: pagination.current,
     pageSize: pagination.pageSize
@@ -76,8 +73,6 @@ const getApiList = async () => {
   } catch (error) {
     apiList.value = [];
     return Promise.reject(error);
-  } finally {
-    loading.value = false;
   }
 };
 const setRowKey = (record: Api) => {
