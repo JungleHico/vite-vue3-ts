@@ -1,5 +1,5 @@
 <template>
-  <a-modal :visible="visible" :title="title" @ok="onOk">
+  <a-modal :visible="visible" :title="title" :mask-closable="false" @ok="onOk">
     <a-form v-bind="formItemLayout">
       <a-form-item label="ID">
         <a-input v-model:value="modelRef.id" disabled />
@@ -20,21 +20,22 @@
 
 <script setup lang="ts">
 import { Form } from 'ant-design-vue';
+import { formItemLayout } from './data';
 
-type Props = {
+interface Props {
   visible: boolean;
-  action: Action;
+  action: TableAction;
   data?: TableListItem | null;
-};
-type Emits = {
+}
+interface Emits {
   (event: 'update:visible', value: boolean): void;
   (event: 'ok'): void;
-};
-type FormState = {
+}
+interface FormState {
   id?: number;
   desc: string;
   online: boolean;
-};
+}
 
 const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
@@ -45,23 +46,19 @@ const title = computed(() => {
 // 表单数据
 const modelRef = reactive<FormState>({
   desc: '',
-  online: false
+  online: false,
 });
 // 表单校验规则
 const rulesRef = reactive({
   desc: [
     {
       required: true,
-      message: '请输入描述'
-    }
-  ]
+      message: '请输入描述',
+    },
+  ],
 });
 const useForm = Form.useForm;
 const { resetFields, validate, validateInfos } = useForm(modelRef, rulesRef);
-const formItemLayout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 18 }
-};
 
 watch(
   () => props.visible,
@@ -77,12 +74,11 @@ watch(
       // 关闭弹窗，重置表单
       resetFields();
     }
-  }
+  },
 );
 
 const onOk = () => {
   validate().then((...params) => {
-    console.log(toRaw(modelRef));
     if (props.action === 'create') {
       // TODO 创建数据
     } else {

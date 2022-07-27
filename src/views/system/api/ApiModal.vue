@@ -1,108 +1,97 @@
 <template>
-  <a-modal :visible="visible" :title="title" :mask-closable="false" @ok="onOk">
-    <a-form v-bind="formItemLayout">
-      <a-form-item v-if="action === 'edit'" label="ID">
-        <a-input v-model:value="modelRef.id" disabled />
-      </a-form-item>
-      <a-form-item label="API路径" v-bind="validateInfos.path">
-        <a-input v-model:value="modelRef.path" />
-      </a-form-item>
-      <a-form-item label="方法" v-bind="validateInfos.method">
-        <a-select v-model:value="modelRef.method" :options="methodOptions">
-        </a-select>
-      </a-form-item>
-      <a-form-item label="描述" v-bind="validateInfos.desc">
-        <a-input v-model:value="modelRef.desc" />
-      </a-form-item>
-      <a-form-item label="API分组">
-        <a-input v-model:value="modelRef.group" />
-      </a-form-item>
-    </a-form>
-  </a-modal>
+  <template>
+    <a-modal
+      :visible="visible"
+      :title="title"
+      :confirm-loading="confirmLoading"
+      :mask-closable="false"
+      @cancel="onCancel"
+      @ok="onOk"
+    >
+      <a-form v-bind="formItemLayout">
+        <a-form-item label="API路径" v-bind="validateInfos.path">
+          <a-input v-model:value="formState.path" />
+        </a-form-item>
+        <a-form-item label="method" v-bind="validateInfos.method">
+          <a-select v-model:value="formState.method" :options="methodOptions"> </a-select>
+        </a-form-item>
+        <a-form-item label="描述" v-bind="validateInfos.desc">
+          <a-input v-model:value="formState.desc" />
+        </a-form-item>
+        <a-form-item label="API分组">
+          <a-input v-model:value="formState.group" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+  </template>
 </template>
 
 <script setup lang="ts">
-import { Form } from 'ant-design-vue';
+import { formItemLayout, methodOptions } from './data';
+import { useApiForm } from './useApiForm';
 
-type Props = {
+interface Props {
   visible: boolean;
   action: Action;
   data?: Api | null;
-};
-type FormState = {
-  id?: number;
-  path: string;
-  desc: string;
-  method: string;
-  group: string;
-};
-type Emits = {
-  (event: 'ok'): void;
-};
+}
+interface Emits {
+  (event: 'update:visible', value: boolean): void;
+  (event: 'update'): void; // 通知父组件更新数据
+}
 
 const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
 
-// 标题
 const title = computed(() => {
   return props.action === 'create' ? '新增API' : '编辑API';
 });
-// 表单布局
-const formItemLayout = {
-  labelCol: { span: 6 },
-  wrapperCol: { span: 16 }
-};
-// 表单数据
-const modelRef = reactive<FormState>({
-  path: '',
-  desc: '',
-  method: '',
-  group: ''
-});
-// 表单验证规则
-const rulesRef = reactive({
-  path: [{ required: true, message: '请输入API路径' }],
-  desc: [{ required: true, message: '请输入API描述' }],
-  method: [{ required: true, message: '请选择方法' }]
-});
-const { resetFields, validate, validateInfos } = Form.useForm(
-  modelRef,
-  rulesRef
-);
-const methodOptions = [
-  { value: 'get' },
-  { value: 'post' },
-  { value: 'put' },
-  { value: 'delete' }
-];
+const confirmLoading = ref<boolean>(false);
+
+const { formState, validateInfos, validate, resetFields, dataToFormState } = useApiForm();
 
 watch(
   () => props.visible,
-  async (visible: boolean) => {
+  (visible: boolean) => {
     if (visible) {
+      // 编辑，设置表单
       if (props.action === 'edit' && props.data) {
-        modelRef.id = props.data.id;
-        modelRef.path = props.data.path;
-        modelRef.method = props.data.method;
-        modelRef.desc = props.data.desc;
-        modelRef.group = props.data.group;
+        dataToFormState(props.data, formState);
       }
     } else {
+      // 关闭弹窗时重置表单
       resetFields();
     }
-  }
+  },
 );
 
-const onOk = () => {
-  validate().then(() => {
-    console.log(toRaw(modelRef));
+const onCancel = () => {
+  emits('update:visible', false);
+};
+
+const onOk = async () => {
+  try {
+    await validate();
+    console.log(toRaw(formState));
+    confirmLoading.value = true;
     if (props.action === 'create') {
       // TODO 新增接口
     } else {
-      // TODO 更新接口
+      // TODO 编辑接口
     }
-    emits('ok');
-  });
+    // 模拟接口
+    await new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        resolve();
+      }, 1000);
+    });
+    emits('update:visible', false);
+    emits('update');
+  } catch (error) {
+    console.log('error', error);
+  } finally {
+    confirmLoading.value = false;
+  }
 };
 </script>
 

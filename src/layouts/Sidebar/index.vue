@@ -1,6 +1,6 @@
 <template>
   <a-layout-sider
-    v-model:collapsed="fold"
+    v-model:collapsed="isFold"
     collapsible
     :trigger="null"
     class="sidebar"
@@ -10,36 +10,27 @@
       <router-link to="/">
         <img class="logo" src="@/assets/images/logo.png" alt="logo" />
         <transition name="fade-in">
-          <div v-if="!fold" class="sidebar-header-title">后台管理系统</div>
+          <div v-if="!isFold" class="sidebar-header-title">后台管理系统</div>
         </transition>
       </router-link>
     </div>
-    <sidebar-menu :menus="menus"></sidebar-menu>
+    <sidebar-menu :menu="menu"></sidebar-menu>
   </a-layout-sider>
 </template>
 
 <script setup lang="ts">
 import SidebarMenu from './SidebarMenu.vue';
-// import { RouteRecordRaw } from 'vue-router';
-import { useRouterStore } from '@/store/routerStore';
-// import { routes } from '@/router';
-// import { constantRoutes } from '@/router';
-// import { getMenusFromRoutes } from '@/router/utils';
-import { useMenuStore } from '@/store/menuStore';
-import { storeToRefs } from 'pinia';
+import { useSidebarStore } from '@/store/sidebarStore';
+import { usePermissionStore } from '@/store/permissionStore';
 
-// 菜单列表
-// const menus: RouteRecordRaw[] = getMenusFromRoutes(
-//   // routes.find((route: RouteRecordRaw) => route.path === '/')?.children || []
-//   constantRoutes.find((route: RouteRecordRaw) => route.path === '/')
-//     ?.children || []
-// );
-const routerStore = useRouterStore();
-const menus = routerStore.menus;
+const sidebarStore = useSidebarStore();
+const isFold = computed(() => {
+  return sidebarStore.isFold;
+});
 
-// 菜单折叠/展开
-const menuStore = useMenuStore();
-const { fold } = storeToRefs(menuStore);
+const permissionStore = usePermissionStore();
+// const menu = permissionStore.menu;
+const menu = computed(() => permissionStore.menu);
 </script>
 
 <style scoped lang="less">

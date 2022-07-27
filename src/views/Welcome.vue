@@ -8,7 +8,7 @@ import { useLoginStore } from '@/store/loginStore';
 const loginStore = useLoginStore();
 
 const message = computed(() => {
-  const username = loginStore.info ? `${loginStore.info.username}，` : '，';
+  const username = loginStore.userInfo ? `${loginStore.userInfo.username}，` : '';
   return `欢迎你，${username}祝你开心每一天！`;
 });
 </script>

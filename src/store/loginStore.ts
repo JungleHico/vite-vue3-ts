@@ -1,22 +1,22 @@
 import { defineStore } from 'pinia';
-import { login, getUserInfo } from '@/api/login';
+import { login, getUserInfo } from '@/api/user';
 
-type LoginState = {
-  info: UserInfo | null; // 用户基本信息，用于判断是否登录
-};
+interface LoginState {
+  userInfo: UserInfo | null; // 用户基本信息，用于判断是否登录
+}
 
 export const useLoginStore = defineStore('login', {
   state: (): LoginState => {
     return {
-      info: null
+      userInfo: null,
     };
   },
   actions: {
-    // 封装登录接口
+    // 登录
     async login(account: Account) {
       try {
         const data = await login(account);
-        // 缓存token
+        // 本地缓存 token
         localStorage.setItem('token', data.token);
       } catch (error) {
         return Promise.reject(error);
@@ -26,17 +26,17 @@ export const useLoginStore = defineStore('login', {
     async getUserInfo() {
       try {
         const data = await getUserInfo();
-        this.info = data;
+        this.userInfo = data;
       } catch (error) {
         return Promise.reject(error);
       }
     },
     // 退出登录
-    logout() {
-      // TODO 退出登录接口（如果需要）
-      // 移除token，清空个人信息
+    async logout() {
+      // TODO 退出登录接口
+      // 移除 token，清空个人信息
       localStorage.removeItem('token');
-      this.info = null;
-    }
-  }
+      this.userInfo = null;
+    },
+  },
 });

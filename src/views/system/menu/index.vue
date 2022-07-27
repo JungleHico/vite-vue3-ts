@@ -1,159 +1,135 @@
 <template>
-  <div class="table-wrapper" ref="tableContainer">
+  <div>
     <custom-table
-      :columns="menuColumns"
+      table-title="菜单管理"
+      :columns="columns"
       :data-source="menuList"
-      :pagination="pagination"
-      toolbar-title="菜单管理"
-      create-button-text="新增根菜单"
-      :table-container="tableContainer"
+      :loading="loading"
+      :scroll="{ x: 1300 }"
+      size="middle"
+      show-table-setting
       :row-key="setRowKey"
-      :expanded-row-keys="expandedRowKeys"
-      @expand="onExpand"
-      @create="onCreate"
-      @refresh="onRefresh"
-      @change="onTableChange"
+      @refresh="getList"
     >
+      <template #toolbar>
+        <a-button type="primary" @click="onCreateRootMenu">
+          <template #icon>
+            <plus-outlined></plus-outlined>
+          </template>
+          新增根菜单
+        </a-button>
+      </template>
+
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'title'">
-          {{ record.meta.title }}
+          {{ record.meta.title || '' }}
         </template>
         <template v-else-if="column.dataIndex === 'icon'">
-          <a-space v-if="record.meta.icon !== ''">
+          <a-space v-if="record.meta.icon && record.meta.icon !== ''">
             <ant-icon :icon="record.meta.icon" />{{ record.meta.icon }}
           </a-space>
         </template>
+        <template v-else-if="column.dataIndex === 'keepAlive'">
+          {{ record.meta.keepAlive ? '是' : '否' }}
+        </template>
         <template v-else-if="column.dataIndex === 'hidden'">
-          <span>{{ text ? '隐藏' : '显示' }}</span>
+          {{ record.meta.hidden ? '是' : '否' }}
         </template>
         <template v-else-if="column.dataIndex === 'action'">
           <a-space size="middle">
-            <a @click="onCreateSubItem(record)"
-              ><plus-outlined></plus-outlined>新增子菜单</a
-            >
+            <a @click="onCreateSubMenu(record)"><plus-outlined></plus-outlined>新增子菜单</a>
             <a @click="onEdit(record)"><edit-outlined></edit-outlined>编辑</a>
-            <a-popconfirm
-              title="确定删除当前菜单吗？"
-              ok-text="删除"
-              cancel-text="取消"
-              :ok-button-props="{ danger: true }"
-              @confirm="onRemove(record)"
-            >
-              <a><delete-outlined></delete-outlined>删除</a>
-            </a-popconfirm>
+            <a @click="onRemove(record)"><delete-outlined></delete-outlined>删除</a>
           </a-space>
         </template>
       </template>
     </custom-table>
-  </div>
 
-  <menu-modal
-    v-model:visible="showModal"
-    :mask-closable="false"
-    :action="action"
-    :data="currentItem"
-    :menu-list="menuList"
-    @cancel="onCancel"
-    @ok="onOk"
-  ></menu-modal>
+    <menu-modal
+      v-model:visible="showModal"
+      :action="action"
+      :data="currentMenuItem"
+      :menu-list="menuList"
+      @update="getList"
+    ></menu-modal>
+  </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'Menu',
+};
+</script>
+
 <script setup lang="ts">
-import CustomTable from '@/components/CustomTable.vue';
+import CustomTable from '@/components/customTable/index.vue';
 import MenuModal from './MenuModal.vue';
 import AntIcon from '@/components/AntIcon.vue';
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined
-} from '@ant-design/icons-vue';
-import { menuColumns } from '@/utils/table';
-import { getMenu } from '@/api/permission';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';
+import { columns } from './data';
+import { getMenuList } from '@/api/system';
+import ConfirmModal from '@/plugins/ConfirmModal';
 
-const menuList = ref<MenuItem[]>([]);
-const tableContainer = ref();
-const pagination = reactive<Pagination>({
-  current: 1,
-  pageSize: 10,
-  total: 0
-});
-const tableSize = ref<TableSize>('default');
-const expandedRowKeys = reactive<number[]>([]); // 展开行
-// 弹窗
+const menuList = ref<MenuListItem[]>([]);
+const loading = ref<boolean>(false);
 const showModal = ref<boolean>(false);
 const action = ref<Action>('create');
-const currentItem = ref<MenuItem | null>(null);
+const currentMenuItem = ref<MenuListItem | null>(null);
 
-const getMenuList = async () => {
-  const params = {
-    current: pagination.current,
-    pageSize: pagination.pageSize
-  };
+const getList = async () => {
+  loading.value = true;
 
   try {
-    const { list, total } = await getMenu(params);
-    menuList.value = list;
-    pagination.total = total;
+    const data = await getMenuList();
+    menuList.value = data;
   } catch (error) {
     menuList.value = [];
     return Promise.reject(error);
+  } finally {
+    loading.value = false;
   }
 };
-const setRowKey = (record: Role) => record.id;
 
-// 刷新
-const onRefresh = () => {
-  getMenuList();
+const setRowKey = (record: MenuListItem) => {
+  return record.id;
 };
-// 翻页，改变分页大小
-const onTableChange = ({ current, pageSize }: any) => {
-  pagination.current = current;
-  pagination.pageSize = pageSize;
-  getMenuList();
-};
-// 展开行
-const onExpand = (expanded: boolean, record: Role) => {
-  if (expanded) {
-    expandedRowKeys.push(record.id);
-  } else {
-    const index = expandedRowKeys.findIndex((id: number) => id === record.id);
-    expandedRowKeys.splice(index, 1);
-  }
-};
-// 新增
-const onCreate = () => {
+
+// 新增根菜单
+const onCreateRootMenu = () => {
   action.value = 'create';
-  currentItem.value = null;
+  currentMenuItem.value = null;
   showModal.value = true;
 };
 // 新增子菜单
-const onCreateSubItem = (record: MenuItem) => {
+const onCreateSubMenu = (record: MenuListItem) => {
   action.value = 'create';
-  currentItem.value = record;
+  currentMenuItem.value = record;
   showModal.value = true;
 };
-// 编辑
-const onEdit = (record: MenuItem) => {
+// 编辑菜单
+const onEdit = (record: MenuListItem) => {
   action.value = 'edit';
-  currentItem.value = record;
+  currentMenuItem.value = record;
   showModal.value = true;
-};
-const onCancel = () => {
-  showModal.value = false;
-};
-const onOk = () => {
-  showModal.value = false;
-  getMenuList();
-};
-// 删除
-const onRemove = (record: MenuItem) => {
-  // TODO 删除接口
-  setTimeout(() => {
-    getMenuList();
-  }, 1000);
 };
 
-getMenuList();
+// 删除
+const onRemove = (record: TableListItem) => {
+  ConfirmModal.error({
+    title: '确定删除当前菜单及子菜单吗？',
+    onOk: async () => {
+      // 模拟接口
+      await new Promise<void>((resolve, reject) => {
+        setTimeout(() => {
+          resolve();
+        }, 1000);
+      });
+      getList();
+    },
+  });
+};
+
+getList();
 </script>
 
 <style scoped></style>

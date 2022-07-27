@@ -1,77 +1,90 @@
 <template>
-  <div class="table-wrapper" ref="tableContainer">
+  <div>
     <custom-table
+      table-title="查询表格"
       :columns="columns"
       :data-source="tableList"
+      :loading="loading"
       :pagination="pagination"
-      toolbar-title="查询表格"
-      :table-container="tableContainer"
+      :scroll="{ x: 850 }"
+      show-table-setting
       :row-key="setRowKey"
       :row-selection="{
         selectedRowKeys: selectedRowKeys,
-        onChange: onSelectChange
+        onChange: onSelectChange,
       }"
-      @create="onCreate"
       @refresh="onRefresh"
       @change="onTableChange"
     >
+      <template #toolbar>
+        <a-button type="primary" @click="onCreate">
+          <template #icon>
+            <plus-outlined></plus-outlined>
+          </template>
+          新增
+        </a-button>
+      </template>
+
       <template #bodyCell="{ column, text, record }">
         <template v-if="column.dataIndex === 'status'">
-          <a-badge
-            :status="getStatus(text).status"
-            :text="getStatus(text).text"
-          />
+          <a-badge :status="getStatus(text).status" :text="getStatus(text).text" />
         </template>
         <template v-else-if="column.dataIndex === 'action'">
           <a-space size="middle">
             <a @click="onEdit(record)"><edit-outlined></edit-outlined>编辑</a>
-            <a @click="onRemove(record)"
-              ><delete-outlined></delete-outlined>删除</a
-            >
+            <a @click="onRemove(record)"><delete-outlined></delete-outlined>删除</a>
           </a-space>
         </template>
       </template>
     </custom-table>
-  </div>
 
-  <table-list-modal
-    v-model:visible="showModal"
-    :mask-closable="false"
-    :action="action"
-    :data="currentItem"
-    @cancel="onCancel"
-    @ok="onOk"
-  ></table-list-modal>
+    <table-list-modal
+      v-model:visible="showModal"
+      :mask-closable="false"
+      :action="action"
+      :data="currentItem"
+      @cancel="onCancel"
+      @ok="onOk"
+    ></table-list-modal>
+  </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'TableList',
+};
+</script>
+
 <script setup lang="ts">
-import CustomTable from '@/components/CustomTable.vue';
+import CustomTable from '@/components/customTable/index.vue';
 import TableListModal from './TableListModal.vue';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';
-import { columns } from '@/utils/table';
-import { getTableList } from '@/api/tableList';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';
+import { columns } from './data';
+import { getTableList } from '@/api/list';
 import ConfirmModal from '@/plugins/ConfirmModal';
 
-const tableContainer = ref();
 const tableList = ref<TableListItem[]>([]);
 const pagination = reactive<Pagination>({
   current: 1,
   pageSize: 10,
-  total: 0
+  total: 0,
 });
-const tableSize = ref<TableSize>('default');
+const loading = ref<boolean>(false);
 const selectedRowKeys = ref<number[]>([]); // 勾选的行
+
 // 弹窗
 const showModal = ref<boolean>(false);
-const action = ref<Action>('create');
+const action = ref<TableAction>('create');
 const currentItem = ref<TableListItem | null>(null);
 
-// methods
+// 获取数据
 const getList = async () => {
   const params = {
     current: pagination.current,
-    pageSize: pagination.pageSize
+    pageSize: pagination.pageSize,
   };
+  loading.value = true;
+  selectedRowKeys.value = []; // 清空勾选项
 
   try {
     const { list, total } = await getTableList(params);
@@ -80,17 +93,20 @@ const getList = async () => {
   } catch (error) {
     tableList.value = [];
     return Promise.reject(error);
+  } finally {
+    loading.value = false;
   }
 };
+
 // 获取状态
 const getStatus = (status: number) => {
   const statusList = [
     { status: 'default', text: '关闭' },
-    { status: 'success', text: '开启' }
+    { status: 'success', text: '开启' },
   ];
   return statusList[status];
 };
-const setRowKey = (record: Api) => {
+const setRowKey = (record: TableListItem) => {
   return record.id;
 };
 
@@ -135,8 +151,6 @@ const onRemove = (record: TableListItem) => {
   ConfirmModal.error({
     title,
     onOk: async () => {
-      // TODO 删除接口
-
       // 模拟接口
       await new Promise<void>((resolve, reject) => {
         setTimeout(() => {
@@ -144,7 +158,7 @@ const onRemove = (record: TableListItem) => {
         }, 1000);
       });
       getList();
-    }
+    },
   });
 };
 

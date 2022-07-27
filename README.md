@@ -25,6 +25,8 @@ yarn dev
 # 或 npm run dev
 ```
 
+
+
 ## Volar 语法提示插件
 
 推荐在 VS Code 中安装 Volar 扩展，Volar 为 Vue3 和 TS 提供了更加友好的语法提示。
@@ -33,9 +35,7 @@ yarn dev
 
 > 安装 Volar 需要先关闭 Vetur 并重启 IDE。
 
-## ESLint
 
-略。
 
 ## Prettier
 
@@ -74,6 +74,8 @@ VS Code 搜索并安装 Prettier 扩展：
 }
 ```
 
+
+
 ### 项目配置
 
 团队开发中，为了对项目代码进行统一格式化，需要在项目中另外引入 Prettier ：
@@ -82,25 +84,37 @@ VS Code 搜索并安装 Prettier 扩展：
 yarn add prettier -D
 ```
 
-创建 `prettierignore` ，配置忽略代码格式化的目录和文件：
+创建 `.prettierignore` ，配置忽略代码格式化的目录和文件：
 
 ```
-node_modules
-dist
+/dist/*
+.local
+.output.js
+/node_modules/**
+
+**/*.svg
+**/*.sh
+
+/public/*
 ```
 
-创建 `.prettierrc.js`：
+创建 `prettier.config.js`：
 
 ```js
 module.exports = {
-  tabWidth: 2,
-  singleQuote: true,
+  printWidth: 100,
   semi: true,
-  trailingComma: 'none'
+  singleQuote: true,
+  trailingComma: 'all',
+  proseWrap: 'never',
+  htmlWhitespaceSensitivity: 'strict',
+  endOfLine: 'auto',
 };
 ```
 
 Prettier 格式化代码时，如果发现项目根目录有配置文件，则会优先使用配置文件的规则，这样就可以对代码统一格式化。
+
+
 
 ## 类型声明文件
 
@@ -108,18 +122,40 @@ Prettier 格式化代码时，如果发现项目根目录有配置文件，则�
 
 ```diff
   {
-    "compilerOptions": {
-+     "typeRoots": ["./node_modules/@types/", "./types"]
-    },
     "include": [
       "src/**/*.ts",
       "src/**/*.d.ts",
       "src/**/*.tsx",
       "src/**/*.vue",
++     "types/**/*.ts"
 +     "types/**/*.d.ts"
     ]
   }
 ```
+
+
+
+## 配置开发服务器
+
+```typescript
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  // ...
+  server: {
+    host: true,
+    port: 3000
+  }
+});
+```
+
+- `host` 指定监听 IP 地址，这样就可以通过局域网打开项目。
+- `port` 指定本地服务器的端口，当端口被占用时，Vite 会监听下一个可用的端口。 
+
+
+
 
 ## setup 语法糖自动导入 API
 
@@ -144,9 +180,9 @@ yarn add unplugin-auto-import -D
       vue(),
 +     AutoImport({
 +       imports: ['vue'],
-+       dts: 'types/auto-imports.d.ts'
-+     })
-+   ]
++       dts: 'types/auto-imports.d.ts',
++     }),
++   ],
   });
 ```
 
@@ -156,6 +192,8 @@ yarn add unplugin-auto-import -D
   const count = ref(0);
   </script>
 ```
+
+
 
 ## 配置路径别名
 
@@ -174,9 +212,9 @@ yarn add @types/node -D
   export default defineConfig({
 +   resolve: {
 +     alias: {
-+       '@': path.resolve(__dirname, 'src')
-+     }
-+   }
++       '@': path.resolve(__dirname, 'src'),
++     },
++   },
   });
 ```
 
@@ -202,13 +240,17 @@ yarn add @types/node -D
 }
 ```
 
+
+
 ## CSS 预处理器
 
-Vite 内置了对 `.scss`, `.sass`, `.less`, `.styl` 和 `.stylus` 文件的支持，只需要安装预处理依赖即可：
+Vite 内置了对 `.scss`, `.sass`, `.less`, `.styl` 和 `.stylus` 文件的支持，只需要安装预处理依赖：
 
 ```sh
 yarn add less -D
 ```
+
+
 
 ## Ant Design Vue 组件库
 
@@ -217,7 +259,7 @@ Ant Design Vue 的用法参考：[Ant Design Vue 官方文档](https://2x.antdv.
 首先安装组件库：
 
 ```sh
-yarn add ant-design-vue@next
+yarn add ant-design-vue
 ```
 
 为了实现按需导入，需要安装 `unplugin-vue-components` 插件：
@@ -236,11 +278,13 @@ yarn add unplugin-vue-components -D
   export default defineConfig({
     plugins: [
 +     Components({
-+       resolvers: [AntDesignVueResolver()]
-+     })
-    ]
++       resolvers: [AntDesignVueResolver()],
++     }),
+    ],
   });
 ```
+
+
 
 ## Vue Router
 
@@ -261,12 +305,12 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: Home
-  }
+  },
 ];
 
 const router = createRouter({
-  history: createWebHistory(''),
-  routes
+  history: createWebHistory(),
+  routes,
 });
 
 export default router;
@@ -313,12 +357,12 @@ yarn add -D @types/nprogress
     {
       path: '/',
       component: Home
-    }
+    },
   ];
 
   const router = createRouter({
     history: createWebHistory(''),
-    routes
+    routes,
   });
 
 + router.beforeEach(() => {
@@ -332,6 +376,8 @@ yarn add -D @types/nprogress
   export default router;
 ```
 
+
+
 ## 封装请求
 
 ### 安装
@@ -342,196 +388,212 @@ yarn add -D @types/nprogress
 yarn add axios
 ```
 
+
+
 ### 基本封装
 
-创建 `src/utils/http.ts` 文件，用于实现封装 axios：
+创建 `src/utils/http.ts` 文件，用于封装基本 axios：
 
 ```typescript
 import axios, { AxiosInstance } from 'axios';
 
-class Request {
-  private _http: AxiosInstance;
-  private static _instance: Request | undefined;
+const http: AxiosInstance = axios.create({
+  baseURL: 'http://localhost:3000', // 接口地址
+  timeout: 10000,
+});
 
-  constructor() {
-    this._http = axios.create({
-      baseURL: '',
-      timeout: 10000
-    });
-  }
-
-  // 返回单例
-  public static getInstance(): Request {
-    this._instance || (this._instance = new Request());
-    return this._instance;
-  }
-}
-
-export default Request.getInstance();
+export default http;
 ```
 
-定义一个 `Request` 类，实现请求的相关业务，首先定义一个 axios 的实例 `_http` ，在构造函数中通过 `axios.create()` 进行创建，然后通过 `getInstance()` 方法返回单例并从模块导出。
+
 
 ### 请求拦截和响应拦截
 
 有些时候，我们需要对请求进行统一配置，例如：
 
-- 请求拦截：在请求头中统一添加鉴权 `token` ，显示全局 loading 等
-- 响应拦截：对接口错误信息统一进行显示（Notification，Message 之类的组件），隐藏全局 loading 等
+- 请求拦截：在请求头中统一添加鉴权 `token` ，显示全局 loading 等。
+- 响应拦截：对接口错误信息统一进行显示（Notification，Message 之类的组件），隐藏全局 loading 等。
 
-```diff
-  import axios, {
-    AxiosInstance,
-+   AxiosRequestConfig,
-+   AxiosRequestHeaders,
-+   AxiosResponse
-  } from 'axios';
-+ import { notification } from 'ant-design-vue';
-+ import 'ant-design-vue/es/notification/style/css';
+我们先定义接口返回的数据格式：
 
-+ // 约束响应数据
-+ type BaseResponse<T> = {
-+   code: number;
-+   data: T;
-+   message: string;
-+ };
-
-  class Request {
-    private _http: AxiosInstance;
-    private static _instance: Request | undefined;
-
-    constructor() {
-      this._http = axios.create({
-        baseURL: '',
-        timeout: 10000
-      });
-+     this.setRequestInterceptors();
-+     this.setResponseInterceptors();
-    }
-
-    // 返回单例
-    public static getInstance(): Request {
-      this._instance || (this._instance = new Request());
-      return this._instance;
-    }
-
-+   // 请求拦截
-+   private setRequestInterceptors() {
-+     this._http.interceptors.request.use(
-+       (config: AxiosRequestConfig) => config,
-+       (error: any) => Promise.reject(error)
-+     );
-+   }
-
-+   // 响应拦截
-+   private setResponseInterceptors() {
-+     this._http.interceptors.response.use(
-+       <T>(response: AxiosResponse): Promise<T> => {
-+         const { code, data, message }: BaseResponse<T> = response.data;
-+         if (code === 0) {
-+           return Promise.resolve(data);
-+         }
-+         notification.error({
-+           message: code + '',
-+           description: message
-+         });
-+         return Promise.reject(message);
-+       },
-+       (error: any) => {
-+         notification.error({
-+           message: '请求失败',
-+           description: error.message
-+         });
-+         return Promise.reject(error);
-+       }
-+     );
-+   }
-  }
-
-  export default Request.getInstance();
+```typescript
+// types/http.d.ts
+// 定义接口返回数据格式
+declare interface HttpResponse<T = any> {
+  code: number;
+  data: T;
+  message: string;
+}
 ```
 
-在构造函数中为 `_http` 实例设置请求拦截和响应拦截。
+然后实现请求拦截和响应拦截：
 
-响应拦截：对于响应数据，我们约定 `response.data` 需要包含 `code`、`data` 和 `message` 三个字段，于是定义类型 `BaseResponse` 进行约束，为了进一步约束 `data` 的类型，我们指定了泛型 `<T>`。当 `code = 0` 时，表示请求正常（具体值看后端接口的约定）， 返回 `data`；当接口请求失败时，通过 `notification` 组件弹出提示。
+```typescript
+import axios, {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
+import { notification } from 'ant-design-vue';
+import 'ant-design-vue/es/notification/style/css';
+
+const http: AxiosInstance = axios.create({
+  baseURL: 'http://localhost:3000',
+  timeout: 10000,
+});
+
+// 请求拦截
+http.interceptors.request.use(
+  (config: AxiosRequestConfig) => {
+    return Promise.resolve(config);
+  },
+  (error: any) => {
+    return Promise.reject(error);
+  },
+);
+
+// 响应拦截（根据接口数据格式进行调整）
+http.interceptors.response.use(
+  <T = any>(response: AxiosResponse): Promise<T> => {
+    const { code, data, message }: HttpResponse = response.data;
+    if (code === 0) {
+      // 请求成功
+      return data;
+    }
+    // 请求异常
+    notification.error({
+      message: code,
+      description: message,
+    });
+    return Promise.reject(message);
+  },
+  // 请求失败
+  (error: any) => {
+    if (error.response) {
+      const { data } = error.response;
+      notification.error({
+        message: '请求失败',
+        description: data.message || error.message,
+      });
+    }
+    return Promise.reject(error);
+  },
+);
+
+export default http;
+```
+
+
 
 ### 封装 GET 请求和 POST 请求
 
-为了方便调用，我们进一步封装 GET 请求（其他请求方式同理）：
+为了实现请求方法的扁平化，我们进一步封装 GET 请求和 POST 请求（其他请求方式同理）：
 
-```diff
-  import axios, {
-    AxiosInstance,
-    AxiosRequestConfig,
-    AxiosRequestHeaders,
-    AxiosResponse
-  } from 'axios';
-  import { notification } from 'ant-design-vue';
-  import 'ant-design-vue/es/notification/style/css';
+```typescript
+// 封装 GET 请求
+export function get<T>(url: string, params = {}, config: AxiosRequestConfig = {}): Promise<T> {
+  return http.get(url, {
+    params,
+    ...config,
+  });
+}
 
-  // 约束响应数据
-  type BaseResponse<T> = {
-    code: number;
-    data: T;
-    message: string;
-  };
-
-  class Request {
-    private _http: AxiosInstance;
-    private static _instance: Request | undefined;
-
-    constructor() {
-      this._http = axios.create({
-        baseURL: '',
-        timeout: 10000
-      });
-      this.setRequestInterceptors();
-      this.setResponseInterceptors();
-    }
-
-    // ...
-
-+   // 封装GET请求
-+   public get<T>(url: string, config: AxiosRequestConfig = {}): Promise<T> {
-+     return this._http.get(url, config);
-+   }
-
-+   // 封装POST请求
-+   public post<T>(
-+     url: string,
-+     data?: any,
-+     config: AxiosRequestConfig = {}
-+   ): Promise<T> {
-+     return this._http.post(url, data, config);
-+   }
-  }
-
-  export default Request.getInstance();
+// 封装 POST 请求
+export function post<T>(url: string, data = {}, config: AxiosRequestConfig = {}): Promise<T> {
+  return http.post(url, data, config);
+}
 ```
 
-上一步响应拦截中，请求会返回一个 `Promise` 对象，我们通过泛型 `<T>` 约束数据的类型。
+除此之外，上一步响应拦截中，请求会返回一个 `Promise` 对象，我们通过泛型 `<T>` 约束数据的类型。
+
+
 
 ### 封装 API
 
 首先创建 `types/user.d.ts` ，用于定义数据类型：
 
 ```typescript
-declare type UserInfo = {
-  username: string;
-  avatar: string;
-};
+declare interface Token {
+  token: string;
+}
 ```
 
-然后创建 `src/api/index.ts` ，用于封装接口，对于不同模块的接口，建议分别创建单独的文件进行管理。
+然后创建 `src/api/user.ts` ，封装用户模块相关的接口。
 
 ```typescript
-import http from '@/utils/http';
+import { post } from '@/utils/http';
 
-// 获取用户基本信息
-export const getUserInfo = () => http.get<UserInfo>('/api/userInfo');
+// 登录
+export const login = (account: Account) => post<Token>('/user/login', account);
 ```
 
+
+
+### proxy 解决开发环境接口跨域问题
+
+受浏览器同源策略的影响，浏览器不能跨域访问接口，而服务器不受此策略的影响，所以可以通过本地服务器代理请求，然后访问不同源的接口。
+
+首先，我们需要创建 `.env.devlopment` 文件来声明开发环境变量：
+
+```
+# 开发环境接口地址（代理目标地址）
+VITE_PROXY_TARGET_URL = http://localhost:3000
+# 开发环境代理
+VITE_PROXY_BASEURL = /api
+```
+
+然后，我们修改接口地址：
+
+```diff
+  const http: AxiosInstance = axios.create({
+-   baseURL: 'http://localhost:3000',
++   baseURL: import.meta.env.VITE_PROXY_BASEURL,
+    timeout: 10000,
+  });
+```
+
+Vite 环境变量相关的内容参考：[Vite 环境变量和模式](https://cn.vitejs.dev/guide/env-and-mode.html) 。
+
+接着，配置本地服务器代理，由于 `vite.config.ts` 中不能直接访问环境变量，所以我们需要基于一个函数进行配置以及通过 `loadEnv` 来加载环境变量（参考 [Vite 情境配置](https://cn.vitejs.dev/config/#conditional-config) 和 [Vite 环境变量](https://cn.vitejs.dev/config/#environment-variables)）：
+
+```diff
+  // vite.config.ts
+- import { defineConfig } from 'vite';
++ import { ConfigEnv, defineConfig, loadEnv } from 'vite';
+  // ...
+
+  // https://vitejs.dev/config/
+- export default defineConfig({
++ export default defineConfig(({ mode }: ConfigEnv) => {
++   const env = loadEnv(mode, process.cwd());
+
+    return {
+      // ...
+      server: {
+        host: true,
+        port: 3000,
++       // 本地服务器代理，解决本地接口跨域问题
++       proxy: {
++         [env.VITE_PROXY_BASEURL]: {
++           target: env.VITE_PROXY_TARGET_URL,
++           changeOrigin: true,
++           rewrite: (path) => path.replace(new RegExp(`^${env.VITE_PROXY_BASEURL}`), ''),
+          },
+        },
+      },
+    };
+  });
+```
+
+我们规定了本地接口以 `/api` 为请求前缀，代理的目标地址为 `http://localhost:3000` ，当本地测试环境发送请求时，就会被本地服务器代理。
+
+
+
 ## Mock
+
+当后端接口数据还没完成时，前端可以通过 Mock 模拟接口数据，实现本地开发。
+
+
 
 ### 安装依赖
 
@@ -547,6 +609,8 @@ yarn add mockjs
 yarn add vite-plugin-mock -D
 ```
 
+
+
 ### 引入插件
 
 ```diff
@@ -555,51 +619,15 @@ yarn add vite-plugin-mock -D
 
   export default defineConfig({
     plugins: [
-+     viteMockServe()
-    ]
+      // ...
++     viteMockServe(),
+    ],
   });
 ```
 
 `vite-plugin-mock` 插件的详细配置参考：[Github: vite-plugin-mock](https://github.com/vbenjs/vite-plugin-mock)
 
-### 添加 Mock 文件
 
-新建 `mock` 文件夹（ `vite-plugin-mock` 插件默认路径），并创建 `index.ts` 文件，对于不同模块的请求，建议分别创建单独的文件进行管理。
-
-```typescript
-// src/mock/index.ts
-import { MockMethod, Recordable } from 'vite-plugin-mock';
-import Mock, { Random } from 'mockjs';
-
-declare type RequestOptions = {
-  url: Recordable;
-  body: Recordable;
-  query: Recordable;
-  headers: Recordable;
-};
-
-const mockServices: MockMethod[] = [
-  {
-    url: '/api/userInfo',
-    method: 'get',
-    timeout: 500,
-    response: ({ url, body, query, headers }: RequestOptions) => {
-      return {
-        code: 0,
-        data: {
-          username: Mock.mock('@cname'),
-          avatar: Random.image('100x100', '#aaa', '#f00', 'a')
-        }
-        message: 'success'
-      };
-    }
-  }
-];
-
-export default mockServices;
-```
-
-更多 Mock.js 的用法参考：[Mock.js 示例](http://mockjs.com/examples.html) 。
 
 ### 添加 TS 编译目录
 
@@ -610,11 +638,119 @@ export default mockServices;
       "src/**/*.d.ts",
       "src/**/*.tsx",
       "src/**/*.vue",
+      "types/**/*.ts",
       "types/**/*.d.ts",
-+     "mock/**/*.ts"
++     "mock/**/*.ts",
++     "mock/**/*.d.ts"
     ]
   }
 ```
+
+
+
+### Mock 相关工具函数
+
+对于 Mock 接口，我们创建 `mock/utils.ts` ，统一封装返回的数据格式：
+
+```typescript
+// 统一接口返回数据格式
+export const successResult = <T>(data: T, code = 0, message = 'success') => {
+  return {
+    code,
+    data,
+    message,
+  };
+};
+
+export const errorResult = (message = 'fail', data = null, code = -1) => {
+  return {
+    code,
+    data,
+    message,
+  };
+};
+```
+
+
+
+### 约束 Mock 请求参数
+
+Mock 请求参数包含几个数据 `method`、`body`、`headers` 和 `query` ，我们对其进行约束：
+
+```typescript
+// types/http.d.ts
+// 定义 Mock 请求参数
+declare interface MockRequestParams {
+  method: string;
+  body: any;
+  headers?: { authorization?: string };
+  query: any;
+}
+```
+
+
+
+### 添加 Mock 文件
+
+我们创建 `mock/user.ts` 文件，对于不同模块的请求，建议分别创建单独的文件进行管理。
+
+```typescript
+import { MockMethod } from 'vite-plugin-mock';
+import { Random } from 'mockjs';
+import { successResult, errorResult } from './utils';
+
+function getUserList() {
+  return [
+    {
+      user_id: 1,
+      username: 'admin',
+      password: '123456',
+      token: 'token1',
+      avatar: Random.image('100x100', '#ccc', '#f00', 'a'),
+    },
+  ];
+}
+
+const userServices: MockMethod[] = [
+  {
+    url: '/user/login',
+    timeout: 500,
+    method: 'post',
+    response: ({ body }: MockRequestParams) => {
+      const { username, password } = body;
+      const checkUser = getUserList().find(
+        (user) => user.username === username && user.password === password,
+      );
+      if (!checkUser) {
+        return resultError('帐号不存在或密码错误');
+      }
+      const { token } = checkUser;
+      return successResult({
+        token,
+      });
+    },
+  },
+];
+
+export default userServices;
+```
+
+更多 Mock.js 的用法参考：[Mock.js 示例](http://mockjs.com/examples.html) 。
+
+
+
+### 修改 baseURL
+
+```diff
+  // src/utils/http.ts
+  const http: AxiosInstance = axios.create({
+-   baseURL: import.meta.env.VITE_PROXY_BASEURL, // 接口
++   baseURL: '', // Mock
+    timeout: 10000,
+  });
+```
+
+
 
 ## Pinia
 
@@ -627,11 +763,16 @@ Pinia 相比于 Vuex 3/4，具有以下特点：
 - 无需手动添加 store，store 创建后会自动添加。
 - 扁平化设计，无嵌套模块，也不需要命名空间，store 之间可以交叉组合使用。
 
+
+
+
 ### 安装
 
 ```sh
 yarn add pinia
 ```
+
+
 
 ### 创建和挂载实例
 
@@ -648,33 +789,38 @@ yarn add pinia
 + app.use(router).use(createPinia()).mount('#app');
 ```
 
+
+
 ### 创建 store
 
 ```ts
 // store/countStore.ts
 import { defineStore } from 'pinia';
 
-type CountState = {
+interface CountState {
   count: number;
-};
+}
 
 export const useCountStore = defineStore('count', {
   state: (): CountState => {
     return {
-      count: 0
+      count: 0,
     };
   },
   actions: {
     increase(value: number) {
       this.count += value;
-    }
-  }
+    },
+  },
 });
 ```
 
 - `defineStore` 函数第一个参数表示 store 的名称，这个值需要唯一。
 - `state` 和 Vue 2 组件中 `data` 选项的声明差不多，一个函数，返回一个对象，对象的属性就是响应式的数据。值得注意的是，`state` 采用箭头函数，这是为了保证服务端渲染也能正常使用。
 - `actions` 和 Vue 2 组件中 `methods` 选项差不多，定义方法，方法内部通过 `this` 访问数据。
+
+
+
 
 ### 使用 store
 
@@ -686,23 +832,21 @@ export const useCountStore = defineStore('count', {
 </template>
 
 <script setup lang="ts">
-import { useCountStore } from '@/store/countStore';
-import { storeToRefs } from 'pinia';
+  import { useCountStore } from '@/store/countStore';
+  import { storeToRefs } from 'pinia';
 
-const countStore = useCountStore();
-const { count } = storeToRefs(countStore);
+  const countStore = useCountStore();
+  const { count } = storeToRefs(countStore);
 
-const onPlus = () => {
-  // countStore.count++
-  // count.value++
-  countStore.increase(1);
-};
+  const onPlus = () => {
+    countStore.increase(1);
+  };
 </script>
 ```
 
-和 Vue 3 中 `toRefs()` 方法类似，Pinia 提供了 `storeToRefs()` 方法，用于对 store 进行解构。
+和 Vue 3 中 `toRefs()` 方法类似，Pinia 提供了 `storeToRefs()` 方法，用于对 store 进行解构。状态值可以直接在组件中修改，但是建议通过 `actions` 封装方法，避免数据混乱，难以维护。
 
-状态值可以直接在组件中修改，但是建议通过 `actions` 封装方法，避免数据混乱，难以维护。
+
 
 ## 登录拦截
 
@@ -712,6 +856,9 @@ const onPlus = () => {
 2. 用户使用账号密码登录后，获取 token，将 token 缓存到本地
 3. 所有（需要鉴权）的接口访问时，都要在请求头中携带 token
 4. 携带 token 请求数据，如果返回 401 未授权，说明 token 过期，需要跳转到登录页，执行第 2 步
+
+
+
 
 ### 实现过程
 
@@ -725,33 +872,33 @@ const onPlus = () => {
 
 ```typescript
 // types/login.ts
-declare type Account = {
-  account: string;
+declare interface Account {
+  username: string;
   password: string;
-};
+}
 
-declare type Token = {
+declare interface Token {
   token: string;
-};
+}
 
-declare type UserInfo = {
+declare interface UserInfo {
+  user_id: number;
   username: string;
   avatar: string;
-};
+}
 ```
 
 2. 定义登录接口
 
 ```typescript
-// src/api/login.ts
-import http from '@/utils/http';
+// src/api/user.ts
+import { get, post } from '@/utils/http';
 
 // 登录
-export const login = (account: Account) =>
-  http.post<Token>('/api/login', account);
+export const login = (account: Account) => post<Token>('/user/login', account);
 
 // 获取用户基本信息
-export const getUserInfo = () => http.get<UserInfo>('/api/userInfo');
+export const getUserInfo = () => get<UserInfo>('/user/info');
 ```
 
 3. 封装登录 store
@@ -759,24 +906,24 @@ export const getUserInfo = () => http.get<UserInfo>('/api/userInfo');
 ```typescript
 // src/store/loginStore.ts
 import { defineStore } from 'pinia';
-import { login, getUserInfo } from '@/api/login';
+import { login, getUserInfo } from '@/api/user';
 
-type LoginState = {
-  info: UserInfo | null; // 用户基本信息，用于判断是否登录
-};
+interface LoginState {
+  userInfo: UserInfo | null; // 用户基本信息，用于判断是否登录
+}
 
 export const useLoginStore = defineStore('login', {
   state: (): LoginState => {
     return {
-      info: null
+      userInfo: null,
     };
   },
   actions: {
-    // 封装登录接口
+    // 登录
     async login(account: Account) {
       try {
         const data = await login(account);
-        // 缓存token
+        // 本地缓存 token
         localStorage.setItem('token', data.token);
       } catch (error) {
         return Promise.reject(error);
@@ -786,19 +933,19 @@ export const useLoginStore = defineStore('login', {
     async getUserInfo() {
       try {
         const data = await getUserInfo();
-        this.info = data;
+        this.userInfo = data;
       } catch (error) {
         return Promise.reject(error);
       }
     },
     // 退出登录
-    logout() {
-      // TODO 退出登录接口（如果需要）
-      // 移除token，清空个人信息
+    async logout() {
+      // TODO 退出登录接口
+      // 移除 token，清空个人信息
       localStorage.removeItem('token');
-      this.info = null;
-    }
-  }
+      this.userInfo = null;
+    },
+  },
 });
 ```
 
@@ -810,45 +957,47 @@ import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 import { useLoginStore } from '@/store/loginStore';
 
+// ...
+
 // 免登录白名单
 const whiteList = ['/login', '/404'];
+// 登录页
+const LOGIN_PATH = '/login';
 
 // 路由守卫，登录拦截
 router.beforeEach(async (to, from) => {
   NProgress.start();
   const token = localStorage.getItem('token');
+
   if (token) {
-    // 有token
+    // 有 token
     const loginStore = useLoginStore();
-    if (loginStore.info) {
+    if (loginStore.userInfo) {
       // 有用户信息，说明已登录
-      if (to.path === '/login') {
+      if (to.path === LOGIN_PATH) {
         // 如果是登录页，则重定向到首页
         return '/';
       }
       return true;
     }
-    // 有token，无用户信息（刷新页面）
+    // 有 token，无用户信息（刷新页面）
     try {
+      // 重新获取用户信息
       await loginStore.getUserInfo();
       return true;
     } catch (error) {
       loginStore.logout();
-      return '/login';
+      return LOGIN_PATH;
     }
   } else {
-    // 无token（未登录/退出登录）
+    // 无 token（未登录/退出登录）
     if (whiteList.includes(to.path)) {
-      // 免登录白名单，正常访问（避免死循环）
+      // 免登录白名单，正常访问（避免登录页死循环）
       return true;
     }
     // 重定向到登录页
-    return '/login';
+    return { path: LOGIN_PATH, query: { redirect: to.fullPath } };
   }
-});
-
-router.afterEach(() => {
-  NProgress.done();
 });
 ```
 
@@ -872,82 +1021,59 @@ Vue Router4 中，路由守卫是异步解析执行，此时导航在所有守�
     AxiosInstance,
     AxiosRequestConfig,
 +   AxiosRequestHeaders,
-    AxiosResponse
+    AxiosResponse,
   } from 'axios';
 
-  class Request {
-	// ...
-
-    // 请求拦截
-    private setRequestInterceptors() {
-      this._http.interceptors.request.use(
-        (config: AxiosRequestConfig) => {
-+         // 请求头添加Authorization
-+         const token = localStorage.getItem('token');
-+         if (token) {
-+           (<AxiosRequestHeaders>(
-+             config.headers
-+           )).Authorization = `Bearer ${token}`;
-+         }
-          return config;
-        },
-        (error: any) => {
-          return Promise.reject(error);
-        }
-      );
-    }
-  }
+  // 请求拦截
+  http.interceptors.request.use(
+    (config: AxiosRequestConfig) => {
++     // 请求头添加 token
++     const token = localStorage.getItem('token');
++     if (token) {
++       (config.headers as AxiosRequestHeaders).Authorization = `Bearer ${token}`;
++     }
+      return Promise.resolve(config);
+    },
+    (error: any) => {
+      return Promise.reject(error);
+    },
+  );
 ```
 
 6. 响应拦截
 
 接口响应拦截，当授权过期时，重定向到登录页：
 
-```diff
-  import axios, {
-    AxiosInstance,
-    AxiosRequestConfig,
-    AxiosRequestHeaders,
-    AxiosResponse
-  } from 'axios';
-  import { notification } from 'ant-design-vue';
-  import 'ant-design-vue/es/notification/style/css';
-+ import { useLoginStore } from '@/store/loginStore';
+```typescript
+// utils/http.ts
+import { useLoginStore } from '@/store/loginStore';
 
-  class Request {
-    // ...
-
-    // 响应拦截
-    private setResponseInterceptors() {
-      this._http.interceptors.response.use(
-        <T>(response: AxiosResponse): Promise<T> => {
-          const { code, data, message }: BaseResponse<T> = response.data;
-          if (code === 0) {
-            return Promise.resolve(data);
-          }
-          notification.error({
-            message: code + '',
-            description: message
-          });
-+         if (code === 401) {
-+           // 授权过期，退出登录，重定向到登录页
-+           const loginStore = useLoginStore();
-+           loginStore.logout();
-+           window.location.reload();
-+         }
-          return Promise.reject(message);
-        },
-        (error: any) => {
-          notification.error({
-            message: '请求失败',
-            description: error.message
-          });
-          return Promise.reject(error);
-        }
-      );
+http.interceptors.response.use(
+  <T = any>(response: AxiosResponse): Promise<T> => {
+	// ...
+    return Promise.reject(message);
+  },
+  // 请求失败
+  async (error: any) => {
+    if (error.response) {
+      const { status, data } = error.response;
+      notification.error({
+        message: '请求失败',
+        description: data.message || error.message,
+      });
+      // 授权过期，退出登录，重定向到登录页
+      if (status === 401) {
+        const loginStore = useLoginStore();
+        await loginStore.logout();
+        window.location.reload();
+      }
     }
-  }
+    return Promise.reject(error);
+  },
+);
 ```
+
+
 
 ## 权限管理
 
@@ -955,9 +1081,13 @@ Vue Router4 中，路由守卫是异步解析执行，此时导航在所有守�
 
 ![role](./docs/images/role.png)
 
+
+
 ### 路由权限/菜单管理及菜单栏
 
 路由权限有两种实现方法，一种是前端配置，一种是后端配置，本项目采用后端配置路由表的方式。
+
+
 
 #### 前端配置路由表
 
@@ -965,6 +1095,10 @@ Vue Router4 中，路由守卫是异步解析执行，此时导航在所有守�
 2. 前端实现通用路由表，这个路由表是静态的，包含不需要登录就可以访问的公共页面，例如：登录页、404 页面等。
 3. 准备动态路由表，路由表通过 `meta.roles` 字段指定允许访问的角色。
 4. 用户登录后，根据 `roles` 比对动态路由表，筛选出可以访问的动态路由表，通过 `router.addRoute()` 添加路由表。
+
+
+
+
 
 #### 后端配置路由表
 
@@ -977,10 +1111,10 @@ Vue Router4 中，路由守卫是异步解析执行，此时导航在所有守�
 ![roleMenu](./docs/images/roleMenu.png)
 
 3. 用户登录后，获取用户有权访问的（动态）路由表。
-
 4. 通过 `router.addRoute()` 添加动态路由表。
-
 5. 匹配其他路由，重定向到 404 页面。
+
+
 
 **实现过程**
 
@@ -991,178 +1125,261 @@ Vue Router4 中，路由守卫是异步解析执行，此时导航在所有守�
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import LayoutMain from '@/layouts/LayoutMain.vue';
 
-// 通用路由表
 export const constantRoutes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: LayoutMain,
-    name: 'home',
-    redirect: '/welcome',
+    name: 'Home',
     meta: { title: '首页' },
-    children: []
+    component: LayoutMain,
+    redirect: '/welcome',
+    children: [
+      {
+        path: '/welcome',
+        name: 'Welcome',
+        meta: { title: '欢迎页', icon: 'HomeOutlined' },
+        component: () => import('@/views/Welcome.vue'),
+      },
+    ],
   },
   {
     path: '/login',
-    component: () => import('@/views/Login.vue'),
-    name: 'login',
-    meta: { hidden: true }
+    name: 'Login',
+    meta: { hidden: true },
+    component: () => import('@/views/login/index.vue'),
   },
   {
     path: '/404',
+    name: '404',
+    meta: { hidden: true },
     component: () => import('@/views/exception/404.vue'),
-    meta: { hidden: true }
-  }
+  },
 ];
 
 const router = createRouter({
   history: createWebHistory(''),
-  routes: constantRoutes
+  routes: constantRoutes,
 });
+
+export default router;
+
 ```
 
-然后，创建一个 store，用来管理路由表：
+然后，需要定义获取用户菜单列表的接口以及对应的类型约束：
 
 ```typescript
-// src/store/routerStore.ts
+// types/permission.d.ts
+import { RouteMeta, RouteRecordRaw } from 'vue-router';
+
+// 从后端获取的菜单
+export interface MenuItem {
+  path: string;
+  name: string;
+  meta?: RouteMeta;
+  component: string;
+  redirect?: string;
+  children?: MenuItem[];
+}
+```
+
+```typescript
+// src/api/menu.ts
+import { get } from '@/utils/http';
+import { MenuItem } from '../../types/permission';
+
+export const getMenu = () => get<MenuItem[]>('/menu/getMenu');
+```
+
+接着，创建一个 store，用来管理路由表：
+
+```typescript
+// src/store/permissionStore.ts
 import { defineStore } from 'pinia';
 import { RouteRecordRaw } from 'vue-router';
-import { constantRoutes } from '@/router/index';
+import { cloneDeep } from 'lodash';
+import router, { constantRoutes } from '@/router';
+import { MenuItem } from '../../types/permission';
+import { getMenu } from '@/api/menu';
 
-type RouterStoreState = {
+interface PermissionState {
   routes: RouteRecordRaw[]; // 总路由表
   asyncRoutes: RouteRecordRaw[]; // 动态添加的路由表
-};
+}
 
-export const useRouterStore = defineStore('router', {
-  state: (): RouterStoreState => {
+export const usePermissionStore = defineStore('permission', {
+  state: (): PermissionState => {
     return {
-      routes: constantRoutes,
-      asyncRoutes: []
+      routes: cloneDeep(constantRoutes),
+      asyncRoutes: [],
     };
   },
   getters: {
-    // 菜单栏渲染列表
-    menus(): RouteRecordRaw[] {
+    // 侧边栏菜单
+    menu(): RouteRecordRaw[] {
       return this.routes[0].children || [];
-    }
+    },
   },
   actions: {
     /**
-     * @desc 递归生成动态路由表
-     * @param menus 后端获取到的菜单列表
+     * @desc 菜单列表转化为动态路由表
+     * @param menu 从后端获取的菜单列表
      */
-    setAsyncRoutes(menus: MenuItem[]) {
-      const modules = import.meta.glob('../**/*.vue');
+    setAsyncRoutes(menu: MenuItem[]) {
+      const modules = import.meta.glob('../**/*.vue'); // 动态导入页面组件
       const routes: RouteRecordRaw[] = [];
-      for (const item of menus) {
+      for (const item of menu) {
+        const { path, name, meta, component, redirect, children } = item;
         const route: RouteRecordRaw = {
-          path: item.path,
-          component: markRaw(modules[`../${item.component}`]),
-          meta: item.meta,
-          redirect: item.redirect
+          path,
+          name,
+          component: modules[`../${component}`],
         };
-        if (item.children) {
-          route.children = this.setAsyncRoutes(item.children);
+        if (meta) {
+          route.meta = meta;
+        }
+        if (redirect) {
+          (route as RouteRecordRaw).redirect = redirect;
+        }
+        if (children) {
+          (route as RouteRecordRaw).children = this.setAsyncRoutes(children);
         }
         routes.push(route);
       }
       return routes;
     },
-    /**
-     * @desc 生成动态路由表，并将动态路由表合并到总路由表
-     * @param menus 后端获取到的菜单列表
-     */
-    generateRoutes(menus: MenuItem[]) {
-      const asyncRoutes = [constantRoutes[0]];
-      asyncRoutes[0].children = this.setAsyncRoutes(menus);
-      this.asyncRoutes = asyncRoutes;
-      this.routes.splice(0, 1, asyncRoutes[0]);
-    }
-  }
+    // 初始化路由
+    async initRouter() {
+      try {
+        const menu: MenuItem[] = await getMenu(); // 获取菜单列表
+        this.asyncRoutes = this.setAsyncRoutes(menu); // 菜单转化为动态路由表
+        // 动态添加路由
+        this.asyncRoutes.forEach((route) => {
+          this.routes[0].children?.push(route);
+          router.addRoute(constantRoutes[0].name as string, route);
+        });
+        // 匹配其他路由，重定向到 404
+        router.addRoute({
+          path: '/:pathMatch(.*)*',
+          redirect: '/404',
+        });
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+    // 重置路由（退出登录）
+    resetRouter() {
+      this.routes = cloneDeep(constantRoutes);
+      this.asyncRoutes = [];
+    },
+  },
 });
 ```
 
-> 我们将动态路由表添加到 `'home'` 路由的 `children`中，这个子路由也会被作为菜单栏进行渲染。
+> 我们将动态路由表添加到第一个路由的 `children` 中，这个子路由表也会被作为菜单栏进行渲染。
 
-然后，在路由守卫中，登录获取动态路由表/菜单列表，添加到路由中：
+然后，在路由守卫中，当用户登录后，设置路由表
 
 ```diff
   // src/router/index.ts
-+ import { useLoginStore } from '@/store/loginStore';
-+ import { getUserMenu } from '@/api/login';
+  import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+  import LayoutMain from '@/layouts/LayoutMain.vue';
+  import NProgress from 'nprogress';
+  import 'nprogress/nprogress.css';
+  import { useLoginStore } from '@/store/loginStore';
++ import { usePermissionStore } from '@/store/permissionStore';
 
-  // ...
+  export const constantRoutes: RouteRecordRaw[] = [
+    {
+      path: '/',
+      name: 'Home',
+      component: LayoutMain,
+      redirect: '/welcome',
+      children: [
+        {
+          path: '/welcome',
+          name: 'Welcome',
+          meta: { title: '欢迎页', icon: 'HomeOutlined' },
+          component: () => import('@/views/Welcome.vue'),
+        },
+      ],
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: () => import('@/views/login/index.vue'),
+    },
+    {
+      path: '/404',
+      name: '404',
+      component: () => import('@/views/exception/404.vue'),
+    },
+  ];
+
+  const router = createRouter({
+    history: createWebHistory(''),
+    routes: constantRoutes,
+  });
 
   // 免登录白名单
   const whiteList = ['/login', '/404'];
-
-+ // 获取用户路由表
-+ const getRoutes = async () => {
-+   const routerStore = useRouterStore();
-+   const menus = await getUserMenu();
-+   routerStore.generateRoutes(menus);
-+   // 动态添加路由
-+   if (routerStore.asyncRoutes[0]?.children) {
-+     routerStore.asyncRoutes[0].children.forEach((route: RouteRecordRaw) => {
-+       // 将动态路由表添加到 'home' 的子路由
-+       router.addRoute('home', route);
-+     });
-+   }
-+   // 匹配其他路由，重定向到404
-+   router.addRoute({
-+     path: '/:pathMatch(.*)*',
-+     redirect: '/404'
-+   });
-+ };
+  // 登录页
+  const LOGIN_PATH = '/login';
 
   // 路由守卫，登录拦截
   router.beforeEach(async (to, from) => {
     NProgress.start();
     const token = localStorage.getItem('token');
+
     if (token) {
-      // 有token
+      // 有 token
       const loginStore = useLoginStore();
-      if (loginStore.info) {
+      if (loginStore.userInfo) {
         // 有用户信息，说明已登录
-        if (to.path === '/login') {
+        if (to.path === LOGIN_PATH) {
           // 如果是登录页，则重定向到首页
           return '/';
         }
         return true;
       }
-      // 有token，无用户信息（刷新页面）
+      // 有 token，无用户信息（刷新页面）
       try {
+        const permissionStore = usePermissionStore();
+
+        // 重新获取用户信息
         await loginStore.getUserInfo();
--       return true;
-+       // 获取用户路由表
-+       await getRoutes();
+-       return true
++       // 生成用户路由表
++       await permissionStore.initRouter();
 +       // 重定向到当前页面，避免路由未更新
 +       return { ...to, replace: true };
       } catch (error) {
         loginStore.logout();
-        return '/login';
+        return LOGIN_PATH;
       }
     } else {
-      // 无token（未登录/退出登录）
+      // 无 token（未登录/退出登录）
       if (whiteList.includes(to.path)) {
-        // 免登录白名单，正常访问（避免死循环）
+        // 免登录白名单，正常访问（避免登录页死循环）
         return true;
       }
       // 重定向到登录页
-      return '/login';
+      return { path: LOGIN_PATH, query: { redirect: to.fullPath } };
     }
   });
+
+  export default router;
 ```
+
+
 
 **菜单栏的实现**
 
-菜单栏基于路由权限（`routerStore.menus`），只有用户有权访问的页面，才会在侧边栏的菜单中出现。
+菜单栏基于路由权限（`permissionStore.menu`），只有用户有权访问的页面，才会在侧边栏的菜单中出现。
 
 菜单栏组件可以参考： [导航菜单 Menu - Ant Design Vue](https://www.antdv.com/components/menu-cn) 。
 
-菜单栏一般不会显示整个路由表，而是选取 `'home'` 路由的 `children`。
-
 菜单项由 `<router-link>` 构成，点击跳转到对应的页面，除此之外，还应该监听路由的变化，根据路由展开/高亮对应的菜单。
+
+
 
 ### 接口权限
 
@@ -1172,41 +1389,138 @@ export const useRouterStore = defineStore('router', {
 
 ![roleApi](./docs/images/roleApi.png)
 
+
+
 ## 打包分析
 
-Vite 基于 Rollup 进行打包，因此，可以使用 Rollup Plugin Visualizer 插件进行打包分析。
+Vite 基于 Rollup 进行打包，我们可以使用 Rollup Plugin Visualizer 插件进行打包分析。
 
 ```sh
 yarn add -D rollup-plugin-visualizer
 ```
 
+我们可以通过 cross-env 指定环境变量，配置打包分析的命令：
+
+```sh
+yarn add -D cross-env
+```
+
+```diff
+  {
+    "scripts": {
+      "dev": "vite",
+      "build": "vue-tsc --noEmit && vite build",
++     "report": "cross-env REPORT=true npm run build",
+      "preview": "vite preview"
+    }
+  }
+```
+
+我们定义了新的打包命令 `report` ，通过 cross-env 指定环境变量 `REPORT=true`
+
+然后按需引入插件：
+
 ```typescript
 // vite.config.ts
-import { defineConfig } from 'vite';
-import { visualizer } from 'rollup-plugin-visualizer';
-
-// https://vitejs.dev/config/
-export default defineConfig({
+{
   plugins: [
+    // ...
     // 打包分析
-    visualizer((options: any) => {
-      return {
-        template: 'sunburst',
-        gzipSize: true
-      };
+    process.env.REPORT === 'true'
+    ? visualizer({
+      filename: 'report.html',
+      open: true,
+      template: 'sunburst',
+      gzipSize: true,
+      brotliSize: true,
     })
-  ]
-});
+    : null,
+  ],
+}
 ```
+
+运行打包命令 `yarn report` ，打包完成后会生成分析报告 `report.html` 并自动打开。
+
+![rollup-plugin-visualizer](./docs/images/rollup-plugin-visualizer.png)
 
 更多配置选项参考：[rollup-plugin-visualizer](https://github.com/btd/rollup-plugin-visualizer) 。
 
-然后打包到生产环境：
 
-```sh
-yarn build
+
+## 首屏加载动画
+
+单页富应用（Single Page Application）的首屏加载相对较慢，会出现一段时间的空白，为改善用户体验，可以添加首屏加载动画。
+
+```html
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+    <style>
+      @keyframes antRotate {
+        to {
+          transform: rotate(405deg);
+        }
+      }
+      .app-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .spin-dots {
+        width: 36px;
+        height: 36px;
+        transform: rotate(45deg);
+        animation: antRotate 1.2s infinite linear;
+      }
+      .spin-dots .spin-dot {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #1890ff;
+      }
+      .spin-dots .spin-dot:nth-child(1) {
+        top: 0;
+        left: 0;
+        opacity: 1;
+      }
+      .spin-dots .spin-dot:nth-child(2) {
+        top: 0;
+        right: 0;
+        opacity: 0.75;
+      }
+      .spin-dots .spin-dot:nth-child(3) {
+        bottom: 0;
+        right: 0;
+        opacity: 0.5;
+      }
+      .spin-dots .spin-dot:nth-child(4) {
+        bottom: 0;
+        left: 0;
+        opacity: 0.25;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <!-- 首屏loading -->
+      <div class="app-loading">
+        <div class="spin-dots">
+          <div class="spin-dot"></div>
+          <div class="spin-dot"></div>
+          <div class="spin-dot"></div>
+          <div class="spin-dot"></div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
 ```
 
-打包完成后会生成 `stats.html` 文件，打开后就是项目打包的可视化分析图。
-
-![rollup-plugin-visualizer](./docs/images/rollup-plugin-visualizer.png)

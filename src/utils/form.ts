@@ -1,4 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs';
+import { Rule } from 'ant-design-vue/es/form';
 
 // 格式化数字输入框（正整数）
 export const integerFormatter = (value: string) => {
@@ -11,6 +12,12 @@ export const disableDateBeforeDay = (current: Dayjs) => {
 };
 
 // 验证手机号码
-export const checkPhoneNumber = (phone: string): boolean => {
+const checkPhoneNumber = (phone: string): boolean => {
   return /^1[3-9][0-9]{9}$/.test(phone);
+};
+export const validatePhone = async (_rule: Rule, value: string) => {
+  if (checkPhoneNumber(value)) {
+    return Promise.resolve();
+  }
+  return Promise.reject('请输入正确的手机号码');
 };

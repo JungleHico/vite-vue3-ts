@@ -1,14 +1,12 @@
 <template>
-  <a-layout class="layout-main">
-    <sidebar></sidebar>
+  <a-layout ref="layoutMain" class="layout-main">
+    <layout-sidebar></layout-sidebar>
     <a-layout class="layout-right">
-      <global-header></global-header>
+      <layout-header></layout-header>
       <a-layout-content class="layout-content">
-        <page-header @refresh="onRefresh"></page-header>
-        <div v-if="showContent" class="content">
-          <a-spin :spinning="loading" size="large">
-            <router-view></router-view>
-          </a-spin>
+        <layout-nav @refresh="onRefresh"></layout-nav>
+        <div class="content">
+          <page-view v-if="showPage"></page-view>
         </div>
       </a-layout-content>
     </a-layout>
@@ -16,20 +14,17 @@
 </template>
 
 <script setup lang="ts">
-import Sidebar from './Sidebar/index.vue';
-import GlobalHeader from './GlobalHeader/index.vue';
-import PageHeader from './PageHeader/index.vue';
-import { useLoadingStore } from '@/store/loadingStore';
-import { storeToRefs } from 'pinia';
+import LayoutSidebar from './sidebar/index.vue';
+import LayoutHeader from './header/index.vue';
+import LayoutNav from './nav/index.vue';
+import PageView from './PageView.vue';
 
-const loadingStore = useLoadingStore();
-const { loading } = storeToRefs(loadingStore);
-const showContent = ref<boolean>(true);
-
+// 页面刷新
+const showPage = ref<boolean>(true);
 const onRefresh = () => {
-  showContent.value = false;
+  showPage.value = false;
   nextTick(() => {
-    showContent.value = true;
+    showPage.value = true;
   });
 };
 </script>

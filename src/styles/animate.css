@@ -6,3 +6,17 @@
 .fade-in-leave-to {
   opacity: 0;
 }
+
+/* 滑动出现/消失动画 */
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s;
+}
+.slide-enter-from {
+  transform: translateX(-30px);
+  opacity: 0;
+}
+.slide-leave-to {
+  transform: translateX(30px);
+  opacity: 0;
+}

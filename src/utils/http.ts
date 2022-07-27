@@ -2,105 +2,82 @@ import axios, {
   AxiosInstance,
   AxiosRequestConfig,
   AxiosRequestHeaders,
-  AxiosResponse
+  AxiosResponse,
 } from 'axios';
 import { notification } from 'ant-design-vue';
 import 'ant-design-vue/es/notification/style/css';
-import { useLoadingStore } from '@/store/loadingStore';
 import { useLoginStore } from '@/store/loginStore';
 
-class Request {
-  private _http: AxiosInstance;
-  private static _instance: Request | undefined;
+const http: AxiosInstance = axios.create({
+  // 接口
+  // baseURL:
+  //   process.env.NODE_ENV === 'production'
+  //     ? import.meta.env.VITE_API_BASEURL
+  //     : import.meta.env.VITE_PROXY_BASEURL,
+  baseURL: '', // Mock
+  timeout: 10000,
+});
 
-  constructor() {
-    this._http = axios.create({
-      baseURL: '',
-      timeout: 10000
+// 请求拦截
+http.interceptors.request.use(
+  (config: AxiosRequestConfig) => {
+    // 请求头添加 token
+    const token = localStorage.getItem('token');
+    if (token) {
+      (config.headers as AxiosRequestHeaders).Authorization = `Bearer ${token}`;
+    }
+    return Promise.resolve(config);
+  },
+  (error: any) => {
+    return Promise.reject(error);
+  },
+);
+
+// 响应拦截（根据接口数据格式进行调整）
+http.interceptors.response.use(
+  <T = any>(response: AxiosResponse): Promise<T> => {
+    const { code, data, message }: HttpResponse = response.data;
+    if (code === 0) {
+      // 请求成功
+      return data;
+    }
+    // 请求异常
+    notification.error({
+      message: code,
+      description: message,
     });
-    this.setRequestInterceptors();
-    this.setResponseInterceptors();
-  }
-
-  // 返回单例
-  public static getInstance(): Request {
-    this._instance || (this._instance = new Request());
-    return this._instance;
-  }
-
-  private showLoading() {
-    const loadingStore = useLoadingStore();
-    loadingStore.showLoading();
-  }
-
-  private hideLoading() {
-    const loadingStore = useLoadingStore();
-    loadingStore.hideLoading();
-  }
-
-  // 请求拦截
-  private setRequestInterceptors() {
-    this._http.interceptors.request.use(
-      (config: AxiosRequestConfig) => {
-        this.showLoading();
-        // 请求头添加Authorization
-        const token = localStorage.getItem('token');
-        if (token) {
-          (<AxiosRequestHeaders>(
-            config.headers
-          )).Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error: any) => Promise.reject(error)
-    );
-  }
-
-  // 响应拦截
-  private setResponseInterceptors() {
-    this._http.interceptors.response.use(
-      <T>(response: AxiosResponse): Promise<T> => {
-        this.hideLoading();
-        const { code, data, message }: BaseResponse<T> = response.data;
-        if (code === 0) {
-          return Promise.resolve(data);
-        }
-        notification.error({
-          message: code + '',
-          description: message
-        });
-        if (code === 401) {
-          // 授权过期，退出登录，重定向到登录页
-          const loginStore = useLoginStore();
-          loginStore.logout();
-          window.location.reload();
-        }
-        return Promise.reject(message);
-      },
-      (error: any) => {
-        this.hideLoading();
-        notification.error({
-          message: '请求失败',
-          description: error.message
-        });
-        return Promise.reject(error);
+    return Promise.reject(message);
+  },
+  // 请求失败
+  async (error: any) => {
+    if (error.response) {
+      const { status, data } = error.response;
+      notification.error({
+        message: '请求失败',
+        description: data.message || error.message,
+      });
+      if (status === 401) {
+        // 授权过期，退出登录，重定向到登录页
+        const loginStore = useLoginStore();
+        await loginStore.logout();
+        window.location.reload();
       }
-    );
-  }
+    }
+    return Promise.reject(error);
+  },
+);
 
-  // 封装GET请求
-  public get<T>(url: string, config: AxiosRequestConfig = {}): Promise<T> {
-    return this._http.get(url, config);
-  }
-
-  // 封装POST请求
-  public post<T>(
-    url: string,
-    data?: any,
-    config: AxiosRequestConfig = {}
-  ): Promise<T> {
-    return this._http.post(url, data, config);
-  }
+// 封装 GET 请求
+export function get<T>(url: string, params = {}, config: AxiosRequestConfig = {}): Promise<T> {
+  return http.get(url, {
+    params,
+    ...config,
+  });
 }
 
-export default Request.getInstance();
+// 封装 POST 请求
+export function post<T>(url: string, data = {}, config: AxiosRequestConfig = {}): Promise<T> {
+  return http.post(url, data, config);
+}
+
+export default http;

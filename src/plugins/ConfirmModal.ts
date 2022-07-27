@@ -9,21 +9,21 @@ const ConfirmModal = {
       icon: createVNode(ExclamationCircleOutlined),
       okType: 'primary',
       autoFocusButton: 'cancel',
-      ...options
+      ...options,
     });
   },
   error(options: ModalFuncProps) {
     return Modal.confirm({
       icon: createVNode(ExclamationCircleOutlined, {
-        style: { color: '#ff4d4f' }
+        style: { color: '#ff4d4f' },
       }),
       okType: 'primary',
       okButtonProps: { danger: true },
       cancelButtonProps: { danger: true },
       autoFocusButton: 'cancel',
-      ...options
+      ...options,
     });
-  }
+  },
 };
 
 export default ConfirmModal;

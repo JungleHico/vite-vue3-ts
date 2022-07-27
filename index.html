@@ -1,13 +1,69 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite App</title>
+    <style>
+      @keyframes antRotate {
+        to {
+          transform: rotate(405deg);
+        }
+      }
+      .app-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .spin-dots {
+        width: 36px;
+        height: 36px;
+        transform: rotate(45deg);
+        animation: antRotate 1.2s infinite linear;
+      }
+      .spin-dots .spin-dot {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #1890ff;
+      }
+      .spin-dots .spin-dot:nth-child(1) {
+        top: 0;
+        left: 0;
+        opacity: 1;
+      }
+      .spin-dots .spin-dot:nth-child(2) {
+        top: 0;
+        right: 0;
+        opacity: 0.75;
+      }
+      .spin-dots .spin-dot:nth-child(3) {
+        bottom: 0;
+        right: 0;
+        opacity: 0.5;
+      }
+      .spin-dots .spin-dot:nth-child(4) {
+        bottom: 0;
+        left: 0;
+        opacity: 0.25;
+      }
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <!-- 首屏loading -->
+      <div class="app-loading">
+        <div class="spin-dots">
+          <div class="spin-dot"></div>
+          <div class="spin-dot"></div>
+          <div class="spin-dot"></div>
+          <div class="spin-dot"></div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
