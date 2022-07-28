@@ -14,7 +14,14 @@
         </transition>
       </router-link>
     </div>
-    <sidebar-menu :menu="menu"></sidebar-menu>
+    <a-menu
+      v-model:openKeys="openKeys"
+      v-model:selectedKeys="selectedKeys"
+      theme="dark"
+      mode="inline"
+    >
+      <sidebar-menu :menu="menu"></sidebar-menu>
+    </a-menu>
   </a-layout-sider>
 </template>
 
@@ -22,15 +29,20 @@
 import SidebarMenu from './SidebarMenu.vue';
 import { useSidebarStore } from '@/store/sidebarStore';
 import { usePermissionStore } from '@/store/permissionStore';
+import { useMenu } from './useMenu';
 
+// 侧边栏折叠/展开
 const sidebarStore = useSidebarStore();
-const isFold = computed(() => {
-  return sidebarStore.isFold;
-});
+const isFold = computed(() => sidebarStore.isFold);
 
+// 菜单列表
 const permissionStore = usePermissionStore();
-// const menu = permissionStore.menu;
 const menu = computed(() => permissionStore.menu);
+
+// 菜单业务
+const { openKeys, selectedKeys, setWatchMenuEffect } = useMenu(menu.value);
+
+setWatchMenuEffect();
 </script>
 
 <style scoped lang="less">
