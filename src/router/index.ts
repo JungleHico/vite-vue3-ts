@@ -5,6 +5,7 @@ import 'nprogress/nprogress.css';
 import { useLoginStore } from '@/store/loginStore';
 import { usePermissionStore } from '@/store/permissionStore';
 import { useVisitedRoutesStore } from '@/store/visitedRoutesStore';
+import type { App } from 'vue';
 
 export const constantRoutes: RouteRecordRaw[] = [
   {
@@ -40,7 +41,7 @@ export const constantRoutes: RouteRecordRaw[] = [
   // },
 ];
 
-const router = createRouter({
+export const router = createRouter({
   history: createWebHistory(''),
   routes: constantRoutes,
 });
@@ -100,4 +101,7 @@ router.afterEach((to) => {
   visitedRoutesStore.setBreadcrumb(to);
 });
 
-export default router;
+// 配置路由
+export const setupRouter = (app: App<Element>) => {
+  app.use(router);
+};

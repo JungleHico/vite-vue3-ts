@@ -300,6 +300,7 @@ yarn add vue-router
 // src/router/index.ts
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/components/Home.vue';
+import type { App } from 'vue';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -308,12 +309,15 @@ const routes: RouteRecordRaw[] = [
   },
 ];
 
-const router = createRouter({
+export const router = createRouter({
   history: createWebHistory(),
   routes,
 });
 
-export default router;
+// 配置路由
+export const setupRouter = (app: App<Element>) => {
+  app.use(router);
+};
 ```
 
 使用 `<router-view>` ：
@@ -331,12 +335,14 @@ export default router;
   // src/main.ts
   import { createApp } from 'vue';
   import App from './App.vue';
-+ import router from './router';
++ import { setupRouter } from './router';
 
 - createApp(App).mount('#app');
 + const app = createApp(App);
 
-+ app.use(router).mount('#app');
++ setupRouter(app);
+
++ app.mount('#app');
 ```
 
 NProgress 插件显示页面加载进度条：
@@ -360,7 +366,7 @@ yarn add -D @types/nprogress
     },
   ];
 
-  const router = createRouter({
+  export const router = createRouter({
     history: createWebHistory(''),
     routes,
   });
@@ -372,8 +378,6 @@ yarn add -D @types/nprogress
 + router.afterEach(() => {
 +   NProgress.done();
 + });
-
-  export default router;
 ```
 
 
@@ -776,17 +780,31 @@ yarn add pinia
 
 ### 创建和挂载实例
 
+```ts
+// src/store/index.ts
+import type { App } from 'vue';
+import { createPinia } from 'pinia';
+
+// 配置状态管理
+export const setupStore = (app: App<Element>) => {
+  app.use(createPinia());
+};
+```
+
 ```diff
   // src/main.ts
   import { createApp } from 'vue';
   import App from './App.vue';
-  import router from './router';
-+ import { createPinia } from 'pinia';
+  import { setupStore } from './store';
++ import { setupRouter } from './router';
 
   const app = createApp(App);
-
-- app.use(router).mount('#app');
-+ app.use(router).use(createPinia()).mount('#app');
+  
++ setupStore(app);
+  
+  setupRouter(app);
+  
+  app.mount('#app');
 ```
 
 
@@ -1155,13 +1173,10 @@ export const constantRoutes: RouteRecordRaw[] = [
   },
 ];
 
-const router = createRouter({
+export const router = createRouter({
   history: createWebHistory(''),
   routes: constantRoutes,
 });
-
-export default router;
-
 ```
 
 然后，需要定义获取用户菜单列表的接口以及对应的类型约束：
@@ -1196,7 +1211,7 @@ export const getMenu = () => get<MenuItem[]>('/menu/getMenu');
 import { defineStore } from 'pinia';
 import { RouteRecordRaw } from 'vue-router';
 import { cloneDeep } from 'lodash';
-import router, { constantRoutes } from '@/router';
+import { router, constantRoutes } from '@/router';
 import { MenuItem } from '../../types/permission';
 import { getMenu } from '@/api/menu';
 
@@ -1314,7 +1329,7 @@ export const usePermissionStore = defineStore('permission', {
     },
   ];
 
-  const router = createRouter({
+  export const router = createRouter({
     history: createWebHistory(''),
     routes: constantRoutes,
   });
@@ -1365,8 +1380,6 @@ export const usePermissionStore = defineStore('permission', {
       return { path: LOGIN_PATH, query: { redirect: to.fullPath } };
     }
   });
-
-  export default router;
 ```
 
 

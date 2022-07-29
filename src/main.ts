@@ -1,9 +1,13 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-import router from './router';
-import { createPinia } from 'pinia';
+import { setupStore } from './store';
+import { setupRouter } from './router';
 import '@/styles/global.less';
 
 const app = createApp(App);
 
-app.use(router).use(createPinia()).mount('#app');
+setupStore(app);
+
+setupRouter(app);
+
+app.mount('#app');

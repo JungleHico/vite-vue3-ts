@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { RouteRecordRaw } from 'vue-router';
 import { cloneDeep } from 'lodash';
-import router, { constantRoutes } from '@/router';
+import { router, constantRoutes } from '@/router';
 import { MenuItem } from '../../types/permission';
 import { getMenu } from '@/api/menu';
 
