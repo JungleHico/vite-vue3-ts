@@ -19,9 +19,9 @@
 
 <script setup lang="ts">
 import { LogoutOutlined } from '@ant-design/icons-vue';
-import { useLoginStore } from '@/store/loginStore';
+import { useLoginStore } from '@/store/modules/loginStore';
 import ConfirmModal from '@/plugins/ConfirmModal';
-import { usePermissionStore } from '@/store/permissionStore';
+import { usePermissionStore } from '@/store/modules/permissionStore';
 import { useRouter } from 'vue-router';
 
 const loginStore = useLoginStore();

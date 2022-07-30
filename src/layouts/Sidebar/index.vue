@@ -27,8 +27,8 @@
 
 <script setup lang="ts">
 import SidebarMenu from './SidebarMenu.vue';
-import { useSidebarStore } from '@/store/sidebarStore';
-import { usePermissionStore } from '@/store/permissionStore';
+import { useSidebarStore } from '@/store/modules/sidebarStore';
+import { usePermissionStore } from '@/store/modules/permissionStore';
 import { useMenu } from './useMenu';
 
 // 侧边栏折叠/展开

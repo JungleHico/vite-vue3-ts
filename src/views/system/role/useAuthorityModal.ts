@@ -1,4 +1,4 @@
-import { useRoleAuthority } from '@/store/roleAuthority';
+import { useRoleAuthority } from '@/store/modules/roleAuthority';
 
 export const useAuthorityModal = () => {
   const showAuthorityModal = ref<boolean>(false); // 是否显示弹窗

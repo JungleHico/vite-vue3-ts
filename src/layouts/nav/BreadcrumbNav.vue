@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { useVisitedRoutesStore } from '@/store/visitedRoutesStore';
+import { useVisitedRoutesStore } from '@/store/modules/visitedRoutesStore';
 import { storeToRefs } from 'pinia';
 
 const visitedRoutesStore = useVisitedRoutesStore();

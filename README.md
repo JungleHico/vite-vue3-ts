@@ -812,7 +812,7 @@ export const setupStore = (app: App<Element>) => {
 ### 创建 store
 
 ```ts
-// store/countStore.ts
+// store/modules/countStore.ts
 import { defineStore } from 'pinia';
 
 interface CountState {
@@ -850,7 +850,7 @@ export const useCountStore = defineStore('count', {
 </template>
 
 <script setup lang="ts">
-  import { useCountStore } from '@/store/countStore';
+  import { useCountStore } from '@/store/modules/countStore';
   import { storeToRefs } from 'pinia';
 
   const countStore = useCountStore();
@@ -922,7 +922,7 @@ export const getUserInfo = () => get<UserInfo>('/user/info');
 3. 封装登录 store
 
 ```typescript
-// src/store/loginStore.ts
+// src/store/modules/loginStore.ts
 import { defineStore } from 'pinia';
 import { login, getUserInfo } from '@/api/user';
 
@@ -973,7 +973,7 @@ export const useLoginStore = defineStore('login', {
 // src/router/index.ts
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
-import { useLoginStore } from '@/store/loginStore';
+import { useLoginStore } from '@/store/modules/loginStore';
 
 // ...
 
@@ -1064,7 +1064,7 @@ Vue Router4 中，路由守卫是异步解析执行，此时导航在所有守�
 
 ```typescript
 // utils/http.ts
-import { useLoginStore } from '@/store/loginStore';
+import { useLoginStore } from '@/store/modules/loginStore';
 
 http.interceptors.response.use(
   <T = any>(response: AxiosResponse): Promise<T> => {
@@ -1207,7 +1207,7 @@ export const getMenu = () => get<MenuItem[]>('/menu/getMenu');
 接着，创建一个 store，用来管理路由表：
 
 ```typescript
-// src/store/permissionStore.ts
+// src/store/modules/permissionStore.ts
 import { defineStore } from 'pinia';
 import { RouteRecordRaw } from 'vue-router';
 import { cloneDeep } from 'lodash';
@@ -1299,8 +1299,8 @@ export const usePermissionStore = defineStore('permission', {
   import LayoutMain from '@/layouts/LayoutMain.vue';
   import NProgress from 'nprogress';
   import 'nprogress/nprogress.css';
-  import { useLoginStore } from '@/store/loginStore';
-+ import { usePermissionStore } from '@/store/permissionStore';
+  import { useLoginStore } from '@/store/modules/loginStore';
++ import { usePermissionStore } from '@/store/modules/permissionStore';
 
   export const constantRoutes: RouteRecordRaw[] = [
     {

@@ -61,7 +61,7 @@ import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
 } from '@ant-design/icons-vue';
-import { useVisitedRoutesStore } from '@/store/visitedRoutesStore';
+import { useVisitedRoutesStore } from '@/store/modules/visitedRoutesStore';
 import { storeToRefs } from 'pinia';
 import { useRouter, useRoute, RouteLocationNormalized } from 'vue-router';
 

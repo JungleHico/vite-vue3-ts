@@ -6,7 +6,7 @@ import axios, {
 } from 'axios';
 import { notification } from 'ant-design-vue';
 import 'ant-design-vue/es/notification/style/css';
-import { useLoginStore } from '@/store/loginStore';
+import { useLoginStore } from '@/store/modules/loginStore';
 
 const http: AxiosInstance = axios.create({
   // 接口

@@ -13,6 +13,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'StepForm',
+};
+</script>
+
 <script setup lang="ts">
 import Step1 from './Step1.vue';
 import Step2 from './Step2.vue';

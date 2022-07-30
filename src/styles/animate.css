@@ -8,15 +8,15 @@
 }
 
 /* 滑动出现/消失动画 */
-.slide-enter-active,
-.slide-leave-active {
+.fade-slide-enter-active,
+.fade-slide-leave-active {
   transition: all 0.3s;
 }
-.slide-enter-from {
+.fade-slide-enter-from {
   transform: translateX(-30px);
   opacity: 0;
 }
-.slide-leave-to {
+.fade-slide-leave-to {
   transform: translateX(30px);
   opacity: 0;
 }

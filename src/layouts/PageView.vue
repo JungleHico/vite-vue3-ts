@@ -1,7 +1,7 @@
 <template>
   <router-view>
-    <template #default="{ Component, route }">
-      <transition name="slide" mode="out-in" appear>
+    <template #default="{ Component }">
+      <transition name="fade-slide" mode="out-in" appear>
         <keep-alive :include="cachedRoutes">
           <component :is="Component" />
         </keep-alive>
@@ -11,9 +11,9 @@
 </template>
 
 <script setup lang="ts">
-import { useVisitedRoutesStore } from '@/store/visitedRoutesStore';
+import { useVisitedRoutesStore } from '@/store/modules/visitedRoutesStore';
 
-// 缓存页面
 const visitedRoutesStore = useVisitedRoutesStore();
+// 缓存页面
 const cachedRoutes = computed(() => visitedRoutesStore.cachedRoutes);
 </script>

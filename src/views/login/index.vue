@@ -40,7 +40,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import { useLoginForm } from './useLoginForm';
 import { useRouter } from 'vue-router';
 import { useRoute } from 'vue-router';
-import { useLoginStore } from '@/store/loginStore';
+import { useLoginStore } from '@/store/modules/loginStore';
 
 const { formState, rules } = useLoginForm();
 const router = useRouter();

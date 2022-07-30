@@ -2,23 +2,23 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import LayoutMain from '@/layouts/LayoutMain.vue';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
-import { useLoginStore } from '@/store/loginStore';
-import { usePermissionStore } from '@/store/permissionStore';
-import { useVisitedRoutesStore } from '@/store/visitedRoutesStore';
+import { useLoginStore } from '@/store/modules/loginStore';
+import { usePermissionStore } from '@/store/modules/permissionStore';
+import { useVisitedRoutesStore } from '@/store/modules/visitedRoutesStore';
 import type { App } from 'vue';
 
 export const constantRoutes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'Home',
-    meta: { title: '首页' },
+    meta: { title: '首页', keepAlive: true },
     component: LayoutMain,
     redirect: '/welcome',
     children: [
       {
         path: '/welcome',
         name: 'Welcome',
-        meta: { title: '欢迎页', icon: 'HomeOutlined' },
+        meta: { title: '欢迎页', icon: 'HomeOutlined', keepAlive: false },
         component: () => import('@/views/Welcome.vue'),
       },
     ],

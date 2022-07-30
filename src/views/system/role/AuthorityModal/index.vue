@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import MenuAuthority from './MenuAuthority.vue';
 import ApiAuthority from './ApiAuthority.vue';
-import { useRoleAuthority } from '@/store/roleAuthority';
+import { useRoleAuthority } from '@/store/modules/roleAuthority';
 import { storeToRefs } from 'pinia';
 
 interface Props {

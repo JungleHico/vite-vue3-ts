@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { getMenuList, getMenuAuthority } from '@/api/system';
-import { useRoleAuthority } from '@/store/roleAuthority';
+import { useRoleAuthority } from '@/store/modules/roleAuthority';
 import { storeToRefs } from 'pinia';
 
 const menuList = ref<MenuListItem[]>([]); // 菜单列表

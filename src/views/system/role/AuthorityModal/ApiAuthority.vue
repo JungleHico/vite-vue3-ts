@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { getAllApiList, getApiAuthority } from '@/api/system';
-import { useRoleAuthority } from '@/store/roleAuthority';
+import { useRoleAuthority } from '@/store/modules/roleAuthority';
 import { storeToRefs } from 'pinia';
 
 interface ApiTreeNode {

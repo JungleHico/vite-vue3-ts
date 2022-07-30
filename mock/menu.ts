@@ -7,8 +7,8 @@ const getMenu = () => {
     {
       path: '/form',
       name: 'Form',
-      meta: { title: '表单页', icon: 'FormOutlined' },
-      component: 'layouts/PageView.vue',
+      meta: { title: '表单页', icon: 'FormOutlined', keepAlive: true },
+      component: 'views/form/index.vue',
       redirect: '/form/basicForm',
       children: [
         {
@@ -28,8 +28,8 @@ const getMenu = () => {
     {
       path: '/list',
       name: 'List',
-      meta: { title: '列表页', icon: 'TableOutlined' },
-      component: 'layouts/PageView.vue',
+      meta: { title: '列表页', icon: 'TableOutlined', keepAlive: true },
+      component: 'views/list/index.vue',
       redirect: '/list/tableList',
       children: [
         {
@@ -50,7 +50,7 @@ const getMenu = () => {
       path: '/exception',
       name: 'Exception',
       meta: { title: '异常页', icon: 'WarningOutlined', keepAlive: false },
-      component: 'layouts/PageView.vue',
+      component: 'views/exception/index.vue',
       redirect: '/exception/403',
       children: [
         {
@@ -76,8 +76,8 @@ const getMenu = () => {
     {
       path: '/system',
       name: 'System',
-      meta: { title: '系统管理', icon: 'SettingOutlined' },
-      component: 'layouts/PageView.vue',
+      meta: { title: '系统管理', icon: 'SettingOutlined', keepAlive: true },
+      component: 'views/system/index.vue',
       redirect: '/system/role',
       children: [
         {
