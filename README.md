@@ -1404,6 +1404,169 @@ export const usePermissionStore = defineStore('permission', {
 
 
 
+## keep-alive 缓存页面
+
+默认情况下，当我们跳转到新的页面时，之前的页面会被销毁，返回之前的页面需要重新渲染，接口也会重新请求。有些时候，我们希望缓存之前页面的状态，就可以用到 Vue 的内置组件 [<keep-alive>](https://v3.cn.vuejs.org/api/built-in-components.html#keep-alive)。Vue 3 中 `<keep-alive>` 的语法：
+
+```vue
+<router-view>
+  <template #default="{ Component }">
+	<keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </template>
+</router-view>
+```
+
+首先，为了区分页面是否需要缓存，我们约定路由的 `meta.keepAlive` 为 `true` 时表示缓存页面。
+
+```typescript
+  {
+    path: '/',
+    name: 'Home',
+    meta: { title: '首页', keepAlive: true },
+    component: LayoutMain,
+    redirect: '/welcome',
+    children: [
+      {
+        path: '/welcome',
+        name: 'Welcome',
+        meta: { title: '欢迎页', icon: 'HomeOutlined', keepAlive: false },
+        component: () => import('@/views/Welcome.vue'),
+      },
+    ],
+  }
+```
+
+`<keep-alive>` 组件的 `include` 属性指定需要缓存的组件名称列表，所以，我们需要为组件和路由指定相同的 `name`，通过路由名称映射组件名称，实现缓存的效果。Vue 3 中，`<script setup>` 语法糖标签中无法声明选项，所以我们需要定义一个普通的 `<script>` ：
+
+```vue
+<template>
+  <div>
+    欢迎页
+  </div>
+</template>
+
+<script lang="ts">
+export default {
+  name: 'Welcome'
+}
+</script>
+
+<script setup lang="ts">
+// ...
+</script>
+
+<style scoped></style>
+```
+
+> 注意：普通标签的 `lang` 值需要和 `<script setup>` 保持一致。
+
+上面的语法稍微有些繁琐，特别是很多组件都需要这样定义，为了简化这部分代码，我们引入 `vite-plugin-vue-setup-extend` 这个插件：
+
+```
+yarn add -D vite-plugin-vue-setup-extend
+```
+
+```typescript
+// vite.config.ts
+import VueSetupExtend from 'vite-plugin-vue-setup-extend';
+
+export default defineConfig({
+  plugins:[
+    VueSetupExtend(),
+  ]
+})
+```
+
+```vue
+<template>
+  <div>
+    欢迎页
+  </div>
+</template>
+
+<script setup lang="ts" name="Welcome">
+// ...
+</script>
+
+<style scoped></style>
+```
+
+这样，我们只需要为 `<script setup>` 指定 `name` 属性即可。
+
+最后，我们过滤路由表，获得 `meta.keepAlive` 的组件名称列表，并赋给 `<keep-alive>` 的 `include` 属性：
+
+```ts
+// src/store/modules/usePermissionStore
+export const usePermissionStore = defineStore('permission', {
+  state: () => {
+    return {
+	  // ...
+    }
+  },
+  getters: {
+    cachedRoutes(): string[] {
+      return this.routes
+        .filter((route) => route.meta.keepAlive)
+        .map((route) => route.name as string);
+    },
+  }
+})
+```
+
+```vue
+<template>
+  <router-view>
+    <template #default="{ Component }">
+      <keep-alive :include="cachedRoutes">
+        <component :is="Component" />
+      </keep-alive>
+    </template>
+  </router-view>
+</template>
+
+<script setup lang="ts">
+import { usePermissionStore } from '@/store/modules/permissionStore';
+
+const permissionStore = usePermissionStore();
+cosnt cachedRoutes = computed(() => permissionStore.cachedRoutes)
+</script>
+```
+
+我们还可以通过 Vue 内置组件 `<transition>` 指定页面切换过渡动画：
+
+```css
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s;
+}
+.fade-slide-enter-from {
+  transform: translateX(-30px);
+  opacity: 0;
+}
+.fade-slide-leave-to {
+  transform: translateX(30px);
+  opacity: 0;
+}
+```
+
+```diff
+  <router-view>
+    <template #default="{ Component }">
++     <transition name="fade-slide" mode="out-in" appear>
+        <keep-alive :include="cachedRoutes">
+          <component :is="Component" />
+        </keep-alive>
++     </transition>
+    </template>
+  </router-view>
+```
+
+> 注意：多级路由嵌套时 `<keep-alive>` 会失效，有两种解决办法：一种是将路由展开成扁平结构，另一种是定义一个通过的父级路由组件，包含以上 `<keep-alive>` 的代码，本项目采用了第二种（参考 `src/layouts/PageView.vue`）。
+
+
+
 ## 打包分析
 
 Vite 基于 Rollup 进行打包，我们可以使用 Rollup Plugin Visualizer 插件进行打包分析。
