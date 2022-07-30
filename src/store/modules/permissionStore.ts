@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { RouteRecordRaw } from 'vue-router';
 import { cloneDeep } from 'lodash';
 import { router, constantRoutes } from '@/router';
-import { MenuItem } from '../../types/permission';
+import { MenuItem } from '../../../types/permission';
 import { getMenu } from '@/api/menu';
 
 interface PermissionState {
@@ -29,14 +29,14 @@ export const usePermissionStore = defineStore('permission', {
      * @param menu 从后端获取的菜单列表
      */
     setAsyncRoutes(menu: MenuItem[]) {
-      const modules = import.meta.glob('../**/*.vue'); // 动态导入页面组件
+      const modules = import.meta.glob('../../**/*.vue'); // 动态导入页面组件
       const routes: RouteRecordRaw[] = [];
       for (const item of menu) {
         const { path, name, meta, component, redirect, children } = item;
         const route: RouteRecordRaw = {
           path,
           name,
-          component: modules[`../${component}`],
+          component: modules[`../../${component}`],
         };
         if (meta) {
           route.meta = meta;
