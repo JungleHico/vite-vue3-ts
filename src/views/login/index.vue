@@ -35,7 +35,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="Login">
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import { useLoginForm } from './useLoginForm';
 import { useRouter } from 'vue-router';

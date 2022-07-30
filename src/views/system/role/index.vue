@@ -40,13 +40,7 @@
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'Role',
-};
-</script>
-
-<script setup lang="ts">
+<script setup lang="ts" name="Role">
 import CustomTable from '@/components/customTable/index.vue';
 import RoleModal from './RoleModal.vue';
 import AuthorityModal from './authorityModal/index.vue';

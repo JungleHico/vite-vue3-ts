@@ -4,6 +4,7 @@ import AutoImport from 'unplugin-auto-import/vite';
 import * as path from 'path';
 import Components from 'unplugin-vue-components/vite';
 import { AntDesignVueResolver } from 'unplugin-vue-components/resolvers';
+import VueSetupExtend from 'vite-plugin-vue-setup-extend';
 import { viteMockServe } from 'vite-plugin-mock';
 import { visualizer } from 'rollup-plugin-visualizer';
 
@@ -30,6 +31,8 @@ export default defineConfig(({ command, mode }: ConfigEnv) => {
       Components({
         resolvers: [AntDesignVueResolver()],
       }),
+      // setup 语法糖定义组件名称
+      VueSetupExtend(),
       // Mock
       viteMockServe(),
       // 打包分析

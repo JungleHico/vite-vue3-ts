@@ -47,13 +47,7 @@
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'User',
-};
-</script>
-
-<script setup lang="ts">
+<script setup lang="ts" name="User">
 import CustomTable from '@/components/customTable/index.vue';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';
 import UserModal from './UserModal.vue';

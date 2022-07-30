@@ -34,6 +34,7 @@
     "unplugin-vue-components": "0.21.1",
     "vite": "^2.9.9",
     "vite-plugin-mock": "^2.9.6",
+    "vite-plugin-vue-setup-extend": "^0.4.0",
     "vue-tsc": "^0.34.7"
   }
 }

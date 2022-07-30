@@ -38,13 +38,7 @@
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'Api',
-};
-</script>
-
-<script setup lang="ts">
+<script setup lang="ts" name="Api">
 import CustomTable from '@/components/customTable/index.vue';
 import ApiModal from './ApiModal.vue';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';

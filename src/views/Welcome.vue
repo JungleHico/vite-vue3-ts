@@ -5,7 +5,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts" name="Welcome">
 import { useLoginStore } from '@/store/modules/loginStore';
 
 const loginStore = useLoginStore();

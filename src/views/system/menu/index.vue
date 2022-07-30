@@ -55,13 +55,7 @@
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'Menu',
-};
-</script>
-
-<script setup lang="ts">
+<script setup lang="ts" name="Menu">
 import CustomTable from '@/components/customTable/index.vue';
 import MenuModal from './MenuModal.vue';
 import AntIcon from '@/components/AntIcon.vue';

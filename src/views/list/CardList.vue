@@ -29,13 +29,7 @@
   </a-row>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'CardList',
-};
-</script>
-
-<script setup lang="ts">
+<script setup lang="ts" name="CardList">
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';
 
 interface Card {

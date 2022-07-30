@@ -67,13 +67,7 @@
   </a-form>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'BasicForm',
-};
-</script>
-
-<script setup lang="ts">
+<script setup lang="ts" name="BasicForm">
 import { PlusOutlined } from '@ant-design/icons-vue';
 import { formItemLayout, submitButtonLayout, fruitOptions } from './data';
 import { useBasicForm } from './useBasicForm';

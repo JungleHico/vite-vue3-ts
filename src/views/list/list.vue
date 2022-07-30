@@ -2,13 +2,7 @@
   <page-view></page-view>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'List',
-};
-</script>
-
-<script setup lang="ts">
+<script setup lang="ts" name="List">
 import PageView from '@/layouts/PageView.vue';
 </script>
 

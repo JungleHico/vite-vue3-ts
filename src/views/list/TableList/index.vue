@@ -49,13 +49,7 @@
   </div>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'TableList',
-};
-</script>
-
-<script setup lang="ts">
+<script setup lang="ts" name="TableList">
 import CustomTable from '@/components/customTable/index.vue';
 import TableListModal from './TableListModal.vue';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons-vue';

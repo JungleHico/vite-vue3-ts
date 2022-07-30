@@ -2,13 +2,7 @@
   <page-view></page-view>
 </template>
 
-<script lang="ts">
-export default {
-  name: 'Form',
-};
-</script>
-
-<script setup lang="ts">
+<script setup lang="ts" name="Form">
 import PageView from '@/layouts/PageView.vue';
 </script>
 
