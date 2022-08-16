@@ -7,7 +7,7 @@ export const successResult = <T>(data: T, code = 0, message = 'success') => {
   };
 };
 
-export const resultError = (message = 'fail', data = null, code = -1) => {
+export const errorResult = (message = 'fail', data = null, code = -1) => {
   return {
     code,
     data,

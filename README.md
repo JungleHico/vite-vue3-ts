@@ -25,8 +25,6 @@ yarn dev
 # 或 npm run dev
 ```
 
-
-
 ## Volar 语法提示插件
 
 推荐在 VS Code 中安装 Volar 扩展，Volar 为 Vue3 和 TS 提供了更加友好的语法提示。
@@ -34,8 +32,6 @@ yarn dev
 ![volar](./docs/images/volar.png)
 
 > 安装 Volar 需要先关闭 Vetur 并重启 IDE。
-
-
 
 ## Prettier
 
@@ -74,8 +70,6 @@ VS Code 搜索并安装 Prettier 扩展：
 }
 ```
 
-
-
 ### 项目配置
 
 团队开发中，为了对项目代码进行统一格式化，需要在项目中另外引入 Prettier ：
@@ -98,23 +92,21 @@ yarn add prettier -D
 /public/*
 ```
 
-创建 `prettier.config.js`：
+创建 `.prettierrc`：
 
 ```js
-module.exports = {
-  printWidth: 100,
-  semi: true,
-  singleQuote: true,
-  trailingComma: 'all',
-  proseWrap: 'never',
-  htmlWhitespaceSensitivity: 'strict',
-  endOfLine: 'auto',
-};
+{
+  "printWidth": 100,
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "proseWrap": "never",
+  "htmlWhitespaceSensitivity": "strict",
+  "endOfLine": "auto"
+}
 ```
 
 Prettier 格式化代码时，如果发现项目根目录有配置文件，则会优先使用配置文件的规则，这样就可以对代码统一格式化。
-
-
 
 ## 类型声明文件
 
@@ -133,8 +125,6 @@ Prettier 格式化代码时，如果发现项目根目录有配置文件，则�
   }
 ```
 
-
-
 ## 配置开发服务器
 
 ```typescript
@@ -146,16 +136,13 @@ export default defineConfig({
   // ...
   server: {
     host: true,
-    port: 3000
-  }
+    port: 3000,
+  },
 });
 ```
 
 - `host` 指定监听 IP 地址，这样就可以通过局域网打开项目。
-- `port` 指定本地服务器的端口，当端口被占用时，Vite 会监听下一个可用的端口。 
-
-
-
+- `port` 指定本地服务器的端口，当端口被占用时，Vite 会监听下一个可用的端口。
 
 ## setup 语法糖自动导入 API
 
@@ -192,8 +179,6 @@ yarn add unplugin-auto-import -D
   const count = ref(0);
   </script>
 ```
-
-
 
 ## 配置路径别名
 
@@ -240,8 +225,6 @@ yarn add @types/node -D
 }
 ```
 
-
-
 ## CSS 预处理器
 
 Vite 内置了对 `.scss`, `.sass`, `.less`, `.styl` 和 `.stylus` 文件的支持，只需要安装预处理依赖：
@@ -249,8 +232,6 @@ Vite 内置了对 `.scss`, `.sass`, `.less`, `.styl` 和 `.stylus` 文件的支�
 ```sh
 yarn add less -D
 ```
-
-
 
 ## Ant Design Vue 组件库
 
@@ -284,8 +265,6 @@ yarn add unplugin-vue-components -D
   });
 ```
 
-
-
 ## Vue Router
 
 首先安装 `vue-router`：
@@ -305,7 +284,7 @@ import type { App } from 'vue';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: Home
+    component: Home,
   },
 ];
 
@@ -380,8 +359,6 @@ yarn add -D @types/nprogress
 + });
 ```
 
-
-
 ## 封装请求
 
 ### 安装
@@ -391,8 +368,6 @@ yarn add -D @types/nprogress
 ```sh
 yarn add axios
 ```
-
-
 
 ### 基本封装
 
@@ -408,8 +383,6 @@ const http: AxiosInstance = axios.create({
 
 export default http;
 ```
-
-
 
 ### 请求拦截和响应拦截
 
@@ -433,11 +406,7 @@ declare interface HttpResponse<T = any> {
 然后实现请求拦截和响应拦截：
 
 ```typescript
-import axios, {
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-} from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { notification } from 'ant-design-vue';
 import 'ant-design-vue/es/notification/style/css';
 
@@ -487,8 +456,6 @@ http.interceptors.response.use(
 export default http;
 ```
 
-
-
 ### 封装 GET 请求和 POST 请求
 
 为了实现请求方法的扁平化，我们进一步封装 GET 请求和 POST 请求（其他请求方式同理）：
@@ -510,8 +477,6 @@ export function post<T>(url: string, data = {}, config: AxiosRequestConfig = {})
 
 除此之外，上一步响应拦截中，请求会返回一个 `Promise` 对象，我们通过泛型 `<T>` 约束数据的类型。
 
-
-
 ### 封装 API
 
 首先创建 `types/user.d.ts` ，用于定义数据类型：
@@ -530,8 +495,6 @@ import { post } from '@/utils/http';
 // 登录
 export const login = (account: Account) => post<Token>('/user/login', account);
 ```
-
-
 
 ### proxy 解决开发环境接口跨域问题
 
@@ -591,13 +554,9 @@ Vite 环境变量相关的内容参考：[Vite 环境变量和模式](https://cn
 
 我们规定了本地接口以 `/api` 为请求前缀，代理的目标地址为 `http://localhost:3000` ，当本地测试环境发送请求时，就会被本地服务器代理。
 
-
-
 ## Mock
 
 当后端接口数据还没完成时，前端可以通过 Mock 模拟接口数据，实现本地开发。
-
-
 
 ### 安装依赖
 
@@ -612,8 +571,6 @@ yarn add mockjs
 ```sh
 yarn add vite-plugin-mock -D
 ```
-
-
 
 ### 引入插件
 
@@ -631,8 +588,6 @@ yarn add vite-plugin-mock -D
 
 `vite-plugin-mock` 插件的详细配置参考：[Github: vite-plugin-mock](https://github.com/vbenjs/vite-plugin-mock)
 
-
-
 ### 添加 TS 编译目录
 
 ```diff
@@ -649,8 +604,6 @@ yarn add vite-plugin-mock -D
     ]
   }
 ```
-
-
 
 ### Mock 相关工具函数
 
@@ -675,8 +628,6 @@ export const errorResult = (message = 'fail', data = null, code = -1) => {
 };
 ```
 
-
-
 ### 约束 Mock 请求参数
 
 Mock 请求参数包含几个数据 `method`、`body`、`headers` 和 `query` ，我们对其进行约束：
@@ -691,8 +642,6 @@ declare interface MockRequestParams {
   query: any;
 }
 ```
-
-
 
 ### 添加 Mock 文件
 
@@ -726,7 +675,7 @@ const userServices: MockMethod[] = [
         (user) => user.username === username && user.password === password,
       );
       if (!checkUser) {
-        return resultError('帐号不存在或密码错误');
+        return errorResult('帐号不存在或密码错误');
       }
       const { token } = checkUser;
       return successResult({
@@ -741,8 +690,6 @@ export default userServices;
 
 更多 Mock.js 的用法参考：[Mock.js 示例](http://mockjs.com/examples.html) 。
 
-
-
 ### 修改 baseURL
 
 ```diff
@@ -753,8 +700,6 @@ export default userServices;
     timeout: 10000,
   });
 ```
-
-
 
 ## Pinia
 
@@ -767,16 +712,11 @@ Pinia 相比于 Vuex 3/4，具有以下特点：
 - 无需手动添加 store，store 创建后会自动添加。
 - 扁平化设计，无嵌套模块，也不需要命名空间，store 之间可以交叉组合使用。
 
-
-
-
 ### 安装
 
 ```sh
 yarn add pinia
 ```
-
-
 
 ### 创建和挂载实例
 
@@ -799,15 +739,13 @@ export const setupStore = (app: App<Element>) => {
 + import { setupRouter } from './router';
 
   const app = createApp(App);
-  
+
 + setupStore(app);
-  
+
   setupRouter(app);
-  
+
   app.mount('#app');
 ```
-
-
 
 ### 创建 store
 
@@ -837,9 +775,6 @@ export const useCountStore = defineStore('count', {
 - `state` 和 Vue 2 组件中 `data` 选项的声明差不多，一个函数，返回一个对象，对象的属性就是响应式的数据。值得注意的是，`state` 采用箭头函数，这是为了保证服务端渲染也能正常使用。
 - `actions` 和 Vue 2 组件中 `methods` 选项差不多，定义方法，方法内部通过 `this` 访问数据。
 
-
-
-
 ### 使用 store
 
 ```vue
@@ -850,21 +785,19 @@ export const useCountStore = defineStore('count', {
 </template>
 
 <script setup lang="ts">
-  import { useCountStore } from '@/store/modules/countStore';
-  import { storeToRefs } from 'pinia';
+import { useCountStore } from '@/store/modules/countStore';
+import { storeToRefs } from 'pinia';
 
-  const countStore = useCountStore();
-  const { count } = storeToRefs(countStore);
+const countStore = useCountStore();
+const { count } = storeToRefs(countStore);
 
-  const onPlus = () => {
-    countStore.increase(1);
-  };
+const onPlus = () => {
+  countStore.increase(1);
+};
 </script>
 ```
 
 和 Vue 3 中 `toRefs()` 方法类似，Pinia 提供了 `storeToRefs()` 方法，用于对 store 进行解构。状态值可以直接在组件中修改，但是建议通过 `actions` 封装方法，避免数据混乱，难以维护。
-
-
 
 ## 登录拦截
 
@@ -874,9 +807,6 @@ export const useCountStore = defineStore('count', {
 2. 用户使用账号密码登录后，获取 token，将 token 缓存到本地
 3. 所有（需要鉴权）的接口访问时，都要在请求头中携带 token
 4. 携带 token 请求数据，如果返回 401 未授权，说明 token 过期，需要跳转到登录页，执行第 2 步
-
-
-
 
 ### 实现过程
 
@@ -1068,7 +998,7 @@ import { useLoginStore } from '@/store/modules/loginStore';
 
 http.interceptors.response.use(
   <T = any>(response: AxiosResponse): Promise<T> => {
-	// ...
+    // ...
     return Promise.reject(message);
   },
   // 请求失败
@@ -1091,21 +1021,15 @@ http.interceptors.response.use(
 );
 ```
 
-
-
 ## 权限管理
 
 权限管理基于**角色管理**，为不同的用户分配不同的角色，不同角色能够访问的页面（**路由权限**）和接口（**接口权限**）都是不同的。
 
 ![role](./docs/images/role.png)
 
-
-
 ### 路由权限/菜单管理及菜单栏
 
 路由权限有两种实现方法，一种是前端配置，一种是后端配置，本项目采用后端配置路由表的方式。
-
-
 
 #### 前端配置路由表
 
@@ -1113,10 +1037,6 @@ http.interceptors.response.use(
 2. 前端实现通用路由表，这个路由表是静态的，包含不需要登录就可以访问的公共页面，例如：登录页、404 页面等。
 3. 准备动态路由表，路由表通过 `meta.roles` 字段指定允许访问的角色。
 4. 用户登录后，根据 `roles` 比对动态路由表，筛选出可以访问的动态路由表，通过 `router.addRoute()` 添加路由表。
-
-
-
-
 
 #### 后端配置路由表
 
@@ -1131,8 +1051,6 @@ http.interceptors.response.use(
 3. 用户登录后，获取用户有权访问的（动态）路由表。
 4. 通过 `router.addRoute()` 添加动态路由表。
 5. 匹配其他路由，重定向到 404 页面。
-
-
 
 **实现过程**
 
@@ -1382,8 +1300,6 @@ export const usePermissionStore = defineStore('permission', {
   });
 ```
 
-
-
 **菜单栏的实现**
 
 菜单栏基于路由权限（`permissionStore.menu`），只有用户有权访问的页面，才会在侧边栏的菜单中出现。
@@ -1392,8 +1308,6 @@ export const usePermissionStore = defineStore('permission', {
 
 菜单项由 `<router-link>` 构成，点击跳转到对应的页面，除此之外，还应该监听路由的变化，根据路由展开/高亮对应的菜单。
 
-
-
 ### 接口权限
 
 一般地，如果用户没有权限访问某个接口，应当返回 403 状态码。为此，后台需要配置 API 列表，并且设置角色的接口权限。
@@ -1401,8 +1315,6 @@ export const usePermissionStore = defineStore('permission', {
 ![api](./docs/images/api.png)
 
 ![roleApi](./docs/images/roleApi.png)
-
-
 
 ## keep-alive 缓存页面
 
@@ -1442,15 +1354,13 @@ export const usePermissionStore = defineStore('permission', {
 
 ```vue
 <template>
-  <div>
-    欢迎页
-  </div>
+  <div> 欢迎页 </div>
 </template>
 
 <script lang="ts">
 export default {
-  name: 'Welcome'
-}
+  name: 'Welcome',
+};
 </script>
 
 <script setup lang="ts">
@@ -1470,20 +1380,17 @@ yarn add -D vite-plugin-vue-setup-extend
 
 ```typescript
 // vite.config.ts
+import { defineConfig } from 'vite';
 import VueSetupExtend from 'vite-plugin-vue-setup-extend';
 
 export default defineConfig({
-  plugins:[
-    VueSetupExtend(),
-  ]
-})
+  plugins: [VueSetupExtend()],
+});
 ```
 
 ```vue
 <template>
-  <div>
-    欢迎页
-  </div>
+  <div> 欢迎页 </div>
 </template>
 
 <script setup lang="ts" name="Welcome">
@@ -1502,8 +1409,8 @@ export default defineConfig({
 export const usePermissionStore = defineStore('permission', {
   state: () => {
     return {
-	  // ...
-    }
+      // ...
+    };
   },
   getters: {
     cachedRoutes(): string[] {
@@ -1511,8 +1418,8 @@ export const usePermissionStore = defineStore('permission', {
         .filter((route) => route.meta.keepAlive)
         .map((route) => route.name as string);
     },
-  }
-})
+  },
+});
 ```
 
 ```vue
@@ -1564,8 +1471,6 @@ cosnt cachedRoutes = computed(() => permissionStore.cachedRoutes)
 ```
 
 > 注意：多级路由嵌套时 `<keep-alive>` 会失效，有两种解决办法：一种是将路由展开成扁平结构，另一种是定义一个通过的父级路由组件，包含以上 `<keep-alive>` 的代码，本项目采用了第二种（参考 `src/layouts/PageView.vue`）。
-
-
 
 ## 打包分析
 
@@ -1620,8 +1525,6 @@ yarn add -D cross-env
 ![rollup-plugin-visualizer](./docs/images/rollup-plugin-visualizer.png)
 
 更多配置选项参考：[rollup-plugin-visualizer](https://github.com/btd/rollup-plugin-visualizer) 。
-
-
 
 ## 首屏加载动画
 
@@ -1699,4 +1602,3 @@ yarn add -D cross-env
   </body>
 </html>
 ```
-

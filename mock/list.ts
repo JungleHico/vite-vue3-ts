@@ -1,5 +1,5 @@
 import { MockMethod } from 'vite-plugin-mock';
-import { resultPageSuccess, resultError, getRequestToken } from './utils';
+import { resultPageSuccess, errorResult, getRequestToken } from './utils';
 
 function getTableList() {
   const tableList = [];
@@ -22,7 +22,7 @@ const listServices: MockMethod[] = [
     response: (request: MockRequestParams) => {
       const token = getRequestToken(request);
       if (!token) {
-        return resultError('无效token', null, 401);
+        return errorResult('无效token', null, 401);
       }
       const { query } = request;
       const { current = 1, pageSize = 10 } = query;

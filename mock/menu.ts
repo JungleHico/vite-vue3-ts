@@ -1,6 +1,6 @@
 import { MockMethod } from 'vite-plugin-mock';
 import { MenuItem } from '../types/permission';
-import { successResult, resultError, getRequestToken } from './utils';
+import { successResult, errorResult, getRequestToken } from './utils';
 
 const getMenu = () => {
   const menuList: MenuItem[] = [
@@ -119,7 +119,7 @@ const menuServices: MockMethod[] = [
     response: (request: MockRequestParams) => {
       const token = getRequestToken(request);
       if (!token) {
-        return resultError('无效token', null, 401);
+        return errorResult('无效token', null, 401);
       }
       return successResult(getMenu());
     },

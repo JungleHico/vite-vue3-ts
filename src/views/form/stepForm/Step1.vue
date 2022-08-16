@@ -1,5 +1,5 @@
 <template>
-  <a-form ref="formRef" v-bind="formItemLayout">
+  <a-form v-bind="formItemLayout">
     <a-form-item label="联系人" v-bind="validateInfos.name">
       <a-input v-model:value="formState.name" />
     </a-form-item>

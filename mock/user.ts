@@ -1,6 +1,6 @@
 import { MockMethod } from 'vite-plugin-mock';
 import { Random } from 'mockjs';
-import { successResult, resultError, getRequestToken } from './utils';
+import { successResult, errorResult, getRequestToken } from './utils';
 
 function getUserList() {
   return [
@@ -28,7 +28,7 @@ const userServices: MockMethod[] = [
         (user) => user.username === username && user.password === password,
       );
       if (!checkUser) {
-        return resultError('帐号不存在或密码错误');
+        return errorResult('帐号不存在或密码错误');
       }
       const { token } = checkUser;
       return successResult({
@@ -43,11 +43,11 @@ const userServices: MockMethod[] = [
     response: (request: MockRequestParams) => {
       const token = getRequestToken(request);
       if (!token) {
-        return resultError('无效token', null, 401);
+        return errorResult('无效token', null, 401);
       }
       const checkUser = getUserList().find((user) => user.token === token);
       if (!checkUser) {
-        return resultError('token已过期', null, 401);
+        return errorResult('token已过期', null, 401);
       }
       const { password, token: userToken, ...user } = checkUser;
       return successResult(user);
